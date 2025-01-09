@@ -86,8 +86,8 @@ if __name__ == "__main__":
         print("Usage: python3 1-related-files-generator.py --input path --output path -t number_threads")
         sys.exit(1)
     
-    root_dir = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
-    output = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
+    root_dir = os.path.abspath(sys.argv[sys.argv.index("--input") + 1])
+    output = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
 
     if "-t" in sys.argv:
         n_threads = sys.argv[sys.argv.index("-t") + 1]

@@ -44,6 +44,7 @@ def process_repositories_and_commits(input_csv, output_csv, dataset_dir):
             related_files = eval(row["related_files"])  # Coluna com os arquivos relacionados
 #           repo_path = f"/home/aluno/filtered-repositories-iac-criteria/criteria4/{repo_id}" 
             repo_path = f"{dataset_dir}/{repo_id}"
+            print(repo_path)
             # Contar commits para arquivos IaC
             commit_count = count_commits_for_files(repo_path, iac_paths + related_files)
 
@@ -63,7 +64,7 @@ if __name__=="__main__":
         print("Usage: python3 2-commits-count.py --input path --output path --dataset-dir path")
         sys.exit(1)
     
-    input_path = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
-    output = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
-    dataset_dir = os.path.expanduser(sys.argv[sys.argv.index("--dataset-dir") + 1])
+    input_path = os.path.abspath(sys.argv[sys.argv.index("--input") + 1])
+    output = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
+    dataset_dir = os.path.abspath(sys.argv[sys.argv.index("--dataset-dir") + 1])
     process_repositories_and_commits(input_path, output, dataset_dir)

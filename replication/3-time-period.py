@@ -70,7 +70,7 @@ if __name__=="__main__":
         print("Usage: python3 3-time-period.py --input path --output path --dataset-dir path")
         sys.exit(1)
     
-    input_path = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
-    output = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
-    dataset_dir = os.path.expanduser(sys.argv[sys.argv.index("--dataset-dir") + 1])
+    input_path = os.path.abspath(sys.argv[sys.argv.index("--input") + 1])
+    output = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
+    dataset_dir = os.path.abspath(sys.argv[sys.argv.index("--dataset-dir") + 1])
     process_time_period(input_path, output, dataset_dir)

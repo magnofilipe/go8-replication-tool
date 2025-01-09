@@ -71,7 +71,8 @@ def analyze_and_copy(repo, filters, input_dir, output_dir):
         ):
             target_path = os.path.join(output_dir, repo)
             if not os.path.exists(target_path):
-                os.symlink(repo_path, target_path)
+                repo_path = os.path.abspath(repo_path)
+                os.symlink(repo_path, target_path, target_is_directory= True)
                 print(f"Created symbolic link to repository: {target_path}")
             else:
                 print(f"Link already exists for {repo}")
@@ -85,8 +86,8 @@ if __name__ == "__main__":
         print("Usage: python3 criterias.py --input path --output path --fork --iac-percentage --commits-permonth --num-contributors")
         sys.exit(1)
 
-    input_dir = os.path.expanduser(sys.argv[sys.argv.index('--input') + 1])
-    output_dir = os.path.expanduser(sys.argv[sys.argv.index('--output') + 1])
+    input_dir = os.path.abspath(sys.argv[sys.argv.index('--input') + 1])
+    output_dir = os.path.abspath(sys.argv[sys.argv.index('--output') + 1])
     os.makedirs(output_dir, exist_ok=True)
     
     filters = {
