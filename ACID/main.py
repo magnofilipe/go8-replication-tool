@@ -3,12 +3,11 @@ Akond Rahman
 Mar 19, 2019 : Tuesday 
 ACID: Main 
 '''
+import os
 import excavator
 import constants
 import pandas as pd 
-# import cPickle as pickle
 import pickle
-#import _pickle as pickle 
 import time
 import datetime
 import sys 
@@ -51,6 +50,13 @@ if __name__=='__main__':
         out_fil_nam = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ONLY.PKL'
         out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.csv'
         out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.PKL'
+    elif flag_arg == "VTEX":
+        orgName = "VTEX"
+        print('ACID will now run on VTEX repos')
+        output_location = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
+        out_fil_nam     = output_location + '/REPLICATION_ONLY.PKL'
+        out_csv_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.csv'
+        out_pkl_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.PKL'
     else:
       orgName='TEST'
       print('ACID will now run on default testing repos')
@@ -58,7 +64,14 @@ if __name__=='__main__':
       out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST2_ONLY_CATEG_OUTPUT_FINAL.csv'
       out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST2_ONLY_CATEG_OUTPUT_FINAL.PKL' 
 
-    pathRepo     = constants.ROOT_PUPP_DIR + orgName + '/'    
+    if orgName != 'VTEX':
+        csv_replication = None
+        csv_default     = None
+    else:
+        csv_replication = os.path.expanduser(sys.argv[sys.argv.index("--csv-replication") + 1])
+        csv_default     = os.path.expanduser(sys.argv[sys.argv.index("--csv-default") + 1])
+        
+    pathRepo     = os.path.expanduser(constants.DATASET_DIR + orgName + '/')
     fileName     = pathRepo + constants.REPO_FILE_LIST 
     elgibleRepos = excavator.getEligibleProjects(fileName)
     dic   = {}
@@ -67,7 +80,7 @@ if __name__=='__main__':
         try:
             path_proj = pathRepo + proj_
             branchName = getBranchName(path_proj) 
-            per_proj_commit_dict, per_proj_full_defect_list = excavator.runMiner(orgName, proj_, branchName)
+            per_proj_commit_dict, per_proj_full_defect_list = excavator.runMiner(orgName, proj_, branchName, csv_file_path=csv_replication, csv_default=csv_default)
             categ = categ + per_proj_full_defect_list 
             # print proj_ , len(per_proj_full_defect_list) 
             print('Finished analyzing:', proj_)

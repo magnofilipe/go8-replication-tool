@@ -12,7 +12,6 @@ import  subprocess
 import time 
 import  datetime 
 import pickle
-#import _pickle as pickle 
 from nltk.tokenize import sent_tokenize
 import constants
 import classifier
@@ -277,7 +276,7 @@ def analyzeHgCommit(repo_path_param, repo_branch_param, pupp_commits_mapping):
   return all_commit_file_dict, all_defect_categ_list 
 
 import ast
-def getIacFilesOfRepo(repo_id, csv_file_path = constants.CSV_REPLICATION):
+def getIacFilesOfRepo(repo_id, csv_file_path = constants.CSV_REPLICATION, csv_default = constants.CSV_DEFAULT_PATH):
     with open(csv_file_path, 'r', encoding='utf-8') as csv_file:
         reader = csv.DictReader(csv_file)
         for row in reader:
@@ -286,16 +285,16 @@ def getIacFilesOfRepo(repo_id, csv_file_path = constants.CSV_REPLICATION):
                 iac_paths = ast.literal_eval(row['iac_paths'])
                 related_files = ast.literal_eval(row['related_files'])
                 result = iac_paths + related_files
-                result = [item.replace(constants.CSV_DEFAULT_PATH + repo_id + '/', '') for item in result]
+                result = [item.replace(csv_default + repo_id + '/', '') for item in result]
                 return result
     return None, None
 
 def getId(path):
   return path.split('/')[-1]
 
-def runMiner(orgParamName, repo_name_param, branchParam):
+def runMiner(orgParamName, repo_name_param, branchParam, csv_file_path = None, csv_default = None):
   
-  repo_path   = constants.ROOT_PUPP_DIR + orgParamName + "/" + repo_name_param
+  repo_path   = os.path.expanduser(constants.DATASET_DIR + orgParamName + "/" + repo_name_param)
   repo_branch = branchParam
 
   if 'mozilla' in orgParamName:
@@ -309,6 +308,11 @@ def runMiner(orgParamName, repo_name_param, branchParam):
   elif 'PIPR-replication' in orgParamName:
     repo_id = getId(repo_path)
     all_iac_files_in_repo = getIacFilesOfRepo(repo_id)
+    iac_commits_in_repo = getPuppRelatedCommits(repo_path, all_iac_files_in_repo, repo_branch)
+    commit_file_dict, categ_defect_list = analyzeCommit(repo_path, repo_branch, iac_commits_in_repo)
+  elif 'VTEX' in orgParamName:
+    repo_id = getId(repo_path)
+    all_iac_files_in_repo = getIacFilesOfRepo(repo_id, csv_file_path, csv_default)
     iac_commits_in_repo = getPuppRelatedCommits(repo_path, all_iac_files_in_repo, repo_branch)
     commit_file_dict, categ_defect_list = analyzeCommit(repo_path, repo_branch, iac_commits_in_repo)
   else:

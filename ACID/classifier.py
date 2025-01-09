@@ -10,7 +10,6 @@ from nltk.tokenize import sent_tokenize
 import re 
 import spacy 
 spacy_engine = spacy.load(constants.SPACY_ENG_DICT)
-import future 
 import numpy as np 
 from nltk.stem.porter import *
 stemmerObj = PorterStemmer()

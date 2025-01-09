@@ -4,7 +4,7 @@ Mar 19, 2019
 ACID: Store configuration strings and cosntants here 
 '''
 
-ROOT_PUPP_DIR  = '/home/aluno/ACID-dataset/ARTIFACT/DATASET/' 
+DATASET_DIR  = '/ACID/dataset/' 
 REPO_FILE_LIST = 'eligible_repos.csv'
 MASTER_BRANCH  = 'main' 
 FILE_READ_MODE = 'rU' 
