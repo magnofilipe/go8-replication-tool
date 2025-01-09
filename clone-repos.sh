@@ -91,4 +91,9 @@ export log_file
 repos_to_clone=$(tail -n +$start_line "$repos_file")
 echo "$repos_to_clone" | xargs -P $threads -n 1 -I {} bash -c 'clone_repo "$1"' _ {}
 
-echo "Process completed. Logs saved in $log_file."
+mkdir -p csv
+mv "$log_file" "csv/$log_file"
+
+find "$target_dir" -type d -exec chmod +x {} \;
+
+echo "Process completed. Logs saved in csv/$log_file."
