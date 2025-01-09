@@ -313,8 +313,6 @@ def runMiner(orgParamName, repo_name_param, branchParam, csv_file_path = None, c
     repo_id = getId(repo_path)
     all_iac_files_in_repo = getIacFilesOfRepo(repo_id, csv_file_path, csv_default)
     iac_commits_in_repo = getPuppRelatedCommits(repo_path, all_iac_files_in_repo, repo_branch)
-    print("IAC: ")
-    print(iac_commits_in_repo)
     commit_file_dict, categ_defect_list = analyzeCommit(repo_path, repo_branch, iac_commits_in_repo)
   else:
     all_pp_files_in_repo = getPuppetFilesOfRepo(repo_path)

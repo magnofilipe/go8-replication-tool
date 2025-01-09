@@ -88,7 +88,6 @@ if __name__=='__main__':
             branchName = getBranchName(path_proj) 
             per_proj_commit_dict, per_proj_full_defect_list = excavator.runMiner(orgName, proj_, branchName, csv_file_path=csv_replication, csv_default=csv_default)
             categ = categ + per_proj_full_defect_list 
-            print(categ)
             # print proj_ , len(per_proj_full_defect_list) 
             print('Finished analyzing:', proj_)
             dic[proj_] = (per_proj_commit_dict, per_proj_full_defect_list)
