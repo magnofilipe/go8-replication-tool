@@ -78,6 +78,7 @@ def analyze_csv(file_path, output_csv):
 if __name__=="__main__":
     if not "--input" in sys.argv or not "--output" in sys.argv or not "--dataset-dir" in sys.argv:
         print("Usage: python3 4-analyze.py --input path --output path")
+        sys.exit(1)
     
     input_csv = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
     output_csv = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])

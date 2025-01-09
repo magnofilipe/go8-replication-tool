@@ -68,6 +68,7 @@ def process_time_period(input_csv, output_csv, dataset_dir):
 if __name__=="__main__":
     if not "--input" in sys.argv or not "--output" in sys.argv or not "--dataset-dir" in sys.argv:
         print("Usage: python3 3-time-period.py --input path --output path --dataset-dir path")
+        sys.exit(1)
     
     input_path = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
     output = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
