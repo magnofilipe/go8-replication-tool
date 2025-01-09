@@ -1,6 +1,6 @@
 #!/bin/bash
 
-log_file="run-acid.log"
+log_file="run_acid.log"
 source_dir="criterias/criteria4"
 target_dir="ACID/dataset/VTEX"
 output_dir="csv/acid-output"
@@ -28,15 +28,19 @@ while getopts "c" opt; do
 done
 
 echo "[INFO] Creating directories..." | tee -a "$log_file"
-mkdir -p "$target_dir" | tee -a "$log_file"
-mkdir -p "$output_dir" | tee -a "$log_file"
+mkdir -p "ACID/dataset" | tee -a "$log_file"
+mkdir -p "$target_dir"  | tee -a "$log_file"
+mkdir -p "$output_dir"  | tee -a "$log_file"
 
 echo "[INFO] Creating symbolic links from $source_dir to $target_dir..." | tee -a "$log_file"
 for dir in "$source_dir"/*; do
   if [[ -d "$dir" ]]; then
+    dir_abs_path=$(realpath "$dir")
     dir_name=$(basename "$dir")
-    ln -s "$dir" "$target_dir/$dir_name" 2>>"$log_file"
-    echo "[INFO] Link created: $target_dir/$dir_name -> $dir" | tee -a "$log_file"
+    
+    ln -s "$dir_abs_path" "$target_dir/$dir_name" 2>>"$log_file"
+    
+    echo "[INFO] Link created: $target_dir/$dir_name -> $dir_abs_path" | tee -a "$log_file"
   fi
 done
 
