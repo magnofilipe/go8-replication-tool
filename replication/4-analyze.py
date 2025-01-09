@@ -1,5 +1,7 @@
 import csv
 from datetime import datetime
+import os
+import sys
 
 def analyze_csv(file_path, output_csv):
     results = {
@@ -73,10 +75,13 @@ def analyze_csv(file_path, output_csv):
             })
 
 
-# Exemplo de uso
-input_csv = "iac_time_period.csv"  # Arquivo de entrada
-output_csv = "iac_output_frequency.csv"  # Arquivo de saída
+if __name__=="__main__":
+    if not "--input" in sys.argv or not "--output" in sys.argv or not "--dataset-dir" in sys.argv:
+        print("Usage: python3 4-analyze.py --input path --output path")
+    
+    input_csv = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
+    output_csv = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
 
-analyze_csv(input_csv, output_csv)
+    analyze_csv(input_csv, output_csv)
 
-print(f"Resultados armazenados em: {output_csv}")
+    print(f"Resultados armazenados em: {output_csv}")

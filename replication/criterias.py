@@ -1,17 +1,7 @@
 import os
 import sys
-import shutil
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
-
-# Diretórios de entrada e saída
-# input_dir = os.path.expanduser("~/ACID-dataset/ARTIFACT/DATASET/PIPR-wendell/")
-
-#input_dir = os.path.expanduser("~/filtered-repositories/criteria3/")
-#output_dir = os.path.expanduser("~/filtered-repositories/criteria4/")
-input_dir = os.path.expanduser("~/filtered-repositories-iac-criteria/criteria3/")
-output_dir = os.path.expanduser("~/filtered-repositories-iac-criteria/criteria4/")
-os.makedirs(output_dir, exist_ok=True)
 
 # Extensões de arquivos IAC
 iac_extensions = [".tf", "Pulumi.yaml", "Pulumi.yml", "cdk.json", "cdktf.json"]
@@ -24,16 +14,6 @@ def is_not_fork(repo_path):
     with open(config_file, "r") as f:
         return "fork = true" not in f.read()
     
-    
-# def iac_percentage(repo_path):
-#     total_files = 0
-#     iac_files = 0
-#     for root, _, files in os.walk(repo_path):
-#         for file in files:
-#             total_files += 1
-#             if any(file.endswith(ext) for ext in iac_extensions):
-#                 iac_files += 1
-#     return (iac_files / total_files) * 100 if total_files > 0 else 0
 
 def iac_percentage(repo_path):
     total_files = 0
@@ -75,7 +55,7 @@ def num_contributors(repo_path):
     filtered_emails = {email for email in all_emails if not email.endswith("@github.com")}
     return [len(filtered_emails), filtered_emails]
 
-def analyze_and_copy(repo, filters):
+def analyze_and_copy(repo, filters, input_dir, output_dir):
     repo_path = os.path.join(input_dir, repo)
     try:
         print(f"Analyzing repository: {repo}")
@@ -90,26 +70,36 @@ def analyze_and_copy(repo, filters):
             (not filters['--num-contributors'] or num_contributors(repo_path)[0] >= 10)
         ):
             target_path = os.path.join(output_dir, repo)
-            shutil.copytree(repo_path, target_path)
-            print(f"Copied repository to: {target_path}")
+            if not os.path.exists(target_path):
+                os.symlink(repo_path, target_path)
+                print(f"Created symbolic link to repository: {target_path}")
+            else:
+                print(f"Link already exists for {repo}")
         else:
             print(f"Repository {repo} did not meet the criteria.")
     except Exception as e:
         print(f"Error analyzing repository {repo}: {e}")
 
 if __name__ == "__main__":
+    if not '--input' in sys.argv or not '--output' in sys.argv:
+        print("Usage: python3 criterias.py --input path --output path --fork --iac-percentage --commits-permonth --num-contributors")
+        sys.exit(1)
+
+    input_dir = os.path.expanduser(sys.argv[sys.argv.index('--input') + 1])
+    output_dir = os.path.expanduser(sys.argv[sys.argv.index('--output') + 1])
+    os.makedirs(output_dir, exist_ok=True)
+    
     filters = {
         '--fork': '--fork' in sys.argv,
         '--iac-percentage': '--iac-percentage' in sys.argv,
         '--commits-per-month': '--commits-per-month' in sys.argv,
         '--num-contributors': '--num-contributors' in sys.argv
-    }
-    print(filters)   
+    }   
     
     repos = os.listdir(input_dir)
     
     with ThreadPoolExecutor() as executor:
-        executor.map(lambda repo: analyze_and_copy(repo, filters), repos)
+        executor.map(lambda repo: analyze_and_copy(repo, filters, input_dir, output_dir), repos)
 
     print("Finished processing all repositories.")
 

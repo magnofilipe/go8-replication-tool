@@ -2,6 +2,7 @@ import os
 import subprocess
 import csv
 from datetime import datetime
+import sys
 
 def get_commit_time_period(repo_path, file_paths):
     """
@@ -32,7 +33,7 @@ def get_commit_time_period(repo_path, file_paths):
 
     return min(commit_dates), max(commit_dates)
 
-def process_time_period(input_csv, output_csv):
+def process_time_period(input_csv, output_csv, dataset_dir):
     """
     Processa o CSV de entrada para obter o período de tempo dos commits por tipo de arquivo IaC.
     """
@@ -46,7 +47,8 @@ def process_time_period(input_csv, output_csv):
             repo_id = row["id"]
             iac_type = row["iac_type"]
             iac_paths = eval(row["iac_paths"])  # Coluna com paths dos arquivos IaC
-            repo_path = f"/home/aluno/filtered-repositories-iac-criteria/criteria4/{repo_id}"  # Substitua pelo caminho real do repositório
+#           repo_path = f"/home/aluno/filtered-repositories-iac-criteria/criteria4/{repo_id}"
+            repo_path = f"{dataset_dir}/{repo_id}"
 
             # Obtemos o período de tempo para os arquivos IaC
             oldest_commit, newest_commit = get_commit_time_period(repo_path, iac_paths)
@@ -61,6 +63,13 @@ def process_time_period(input_csv, output_csv):
             row["commit_time_period"] = commit_time_period
             writer.writerow(row)
 
-# Exemplo de uso:
+
 # 3° IaC Time Period
-process_time_period("iac_commits_summary.csv", "iac_time_period.csv")
+if __name__=="__main__":
+    if not "--input" in sys.argv or not "--output" in sys.argv or not "--dataset-dir" in sys.argv:
+        print("Usage: python3 3-time-period.py --input path --output path --dataset-dir path")
+    
+    input_path = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
+    output = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
+    dataset_dir = os.path.expanduser(sys.argv[sys.argv.index("--dataset-dir") + 1])
+    process_time_period(input_path, output, dataset_dir)

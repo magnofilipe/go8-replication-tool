@@ -1,6 +1,7 @@
 import os
 import subprocess
 import csv
+import sys
 
 def count_commits_for_files(repo_path, file_paths):
     """
@@ -27,7 +28,7 @@ def count_commits_for_files(repo_path, file_paths):
     return len(unique_commits)
 
 # Função principal para processar os diretórios e arquivos IaC
-def process_repositories_and_commits(input_csv, output_csv):
+def process_repositories_and_commits(input_csv, output_csv, dataset_dir):
     """
     Processa o CSV de entrada, contando commits relacionados aos arquivos IaC e salvando o resultado em um CSV de saída.
     """
@@ -41,8 +42,8 @@ def process_repositories_and_commits(input_csv, output_csv):
             repo_id = row["id"]
             iac_paths = eval(row["iac_paths"])  # Supondo que você tenha os paths no formato de lista na coluna
             related_files = eval(row["related_files"])  # Coluna com os arquivos relacionados
-            repo_path = f"/home/aluno/filtered-repositories-iac-criteria/criteria4/{repo_id}"  # Substitua pelo caminho real do repositório
-
+#           repo_path = f"/home/aluno/filtered-repositories-iac-criteria/criteria4/{repo_id}" 
+            repo_path = f"{dataset_dir}/{repo_id}"
             # Contar commits para arquivos IaC
             commit_count = count_commits_for_files(repo_path, iac_paths + related_files)
 
@@ -56,6 +57,12 @@ def process_repositories_and_commits(input_csv, output_csv):
             row["total_commit_count"] = total_commits
             writer.writerow(row)
 
-# Exemplo de uso:
 # 2° IaC_Commits_Summary
-process_repositories_and_commits("iac_files_with_neighbors.csv", "iac_commits_summary.csv")
+if __name__=="__main__":
+    if not "--input" in sys.argv or not "--output" in sys.argv or not "--dataset-dir" in sys.argv:
+        print("Usage: python3 2-commits-count.py --input path --output path --dataset-dir path")
+    
+    input_path = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
+    output = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
+    dataset_dir = os.path.expanduser(sys.argv[sys.argv.index("--dataset-dir") + 1])
+    process_repositories_and_commits(input_path, output, dataset_dir)

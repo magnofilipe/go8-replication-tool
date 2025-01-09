@@ -2,9 +2,9 @@ import os
 import csv
 import json
 from concurrent.futures import ThreadPoolExecutor
+import sys
 
 # vou ler o diretorio de criteria 4
-ROOT_DIR = "/home/aluno/filtered-repositories-iac-criteria/criteria4/"  # Diretório raiz
 IAC_FILES = {
     "Pulumi": ["Pulumi.yaml", "Pulumi.yml"],
     "Terraform": ["cdktf.json"],
@@ -12,8 +12,7 @@ IAC_FILES = {
 }  
 ALLOWED_EXTENSIONS = [".py", ".go", ".js", ".ts", ".rb", ".java", ".tf"] 
 # 1° Iac Files With Neighbors
-OUTPUT_CSV = "iac_files_with_neighbors.csv"  
-MAX_THREADS = 100  
+# OUTPUT_CSV = "iac_files_with_neighbors.csv"    
 
 def process_directory(parent_dir, subdir_name):
     """Processa um diretório pai e identifica os arquivos IaC e vizinhos."""
@@ -50,7 +49,7 @@ def process_directory(parent_dir, subdir_name):
     print(f"[DEBUG] Resultados para ID '{subdir_name}': {iac_data}")
     return iac_data
 
-def find_iac_files_with_neighbors_parallel(root_dir):
+def find_iac_files_with_neighbors_parallel(root_dir, MAX_THREADS = 8):
     """Procura arquivos IaC e seus vizinhos usando paralelização."""
     iac_results = []  # Lista para armazenar os resultados
     parent_dirs = [d for d in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, d))]
@@ -82,12 +81,17 @@ def save_to_csv(data, output_file):
             })
     print(f"[DEBUG] Resultados salvos com sucesso em {output_file}")
 
-def main():
-    root_dir = os.path.expanduser(ROOT_DIR)
-
-    iac_data = find_iac_files_with_neighbors_parallel(root_dir)
-    
-    save_to_csv(iac_data, OUTPUT_CSV)
-
 if __name__ == "__main__":
-    main()
+    if not "--input" in sys.argv or not "--output" in sys.argv:
+        print("Usage: python3 1-related-files-generator.py --input path --output path -t number_threads")
+    
+    root_dir = os.path.expanduser(sys.argv[sys.argv.index("--input") + 1])
+    output = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
+
+    if "-t" in sys.argv:
+        n_threads = sys.argv[sys.argv.index("-t") + 1]
+        iac_data = find_iac_files_with_neighbors_parallel(root_dir, n_threads)
+    else:
+        iac_data = find_iac_files_with_neighbors_parallel(root_dir)
+    
+    save_to_csv(iac_data, output)
