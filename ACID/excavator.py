@@ -60,10 +60,9 @@ def getPuppRelatedCommits(repo_dir_absolute_path, ppListinRepo, branchName=const
     commit_of_interest  = str(subprocess.check_output([constants.BASH_CMD, constants.BASH_FLAG, cmd_of_interrest])) #in Python 3 subprocess.check_output returns byte
 
     for ppFile in ppListinRepo:
-      print(ppFile, commit_of_interest)
+      # print(ppFile, commit_of_interest)
       if ppFile in commit_of_interest:
         file_with_path = os.path.join(repo_dir_absolute_path, ppFile)
-        print(file_with_path)
         mapped_tuple = (file_with_path, each_commit)
         mappedPuppetList.append(mapped_tuple)
 
