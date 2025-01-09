@@ -4,5 +4,5 @@ ACID/dataset
 criterias/*
 csv/*
 */__pycache__
-run-acid.log
+run_acid.log
 execution_log.txt
