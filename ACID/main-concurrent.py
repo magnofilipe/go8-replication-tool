@@ -55,9 +55,9 @@ if __name__=='__main__':
         orgName = "VTEX"
         print('ACID will now run on VTEX repos')
         output_location = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
-        out_fil_nam     = output_location + '/REPLICATION_ONLY.PKL'
-        out_csv_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.csv'
-        out_pkl_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.PKL'
+        out_fil_nam     = output_location + '/VTEX_ONLY.PKL'
+        out_csv_fil     = output_location + '/VTEX_ONLY_CATEG_OUTPUT_FINAL.csv'
+        out_pkl_fil     = output_location + '/VTEX_ONLY_CATEG_OUTPUT_FINAL.PKL'
     else:
       orgName='TEST'
       print('ACID will now run on default testing repos')
@@ -65,15 +65,16 @@ if __name__=='__main__':
       out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST_ONLY_CATEG_OUTPUT_FINAL.csv'
       out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST_ONLY_CATEG_OUTPUT_FINAL.PKL' 
 
-    def process_project(orgName, proj_, pathRepo, dic, categ):
+    def process_project(orgName, proj_, pathRepo, dic, categ, csv_replication, csv_default):
      try:
+        if proj_ == constants.REPO_FILE_LIST: return
         path_proj = pathRepo + proj_
         branchName = getBranchName(path_proj)
         
         if branchName is None:
             raise Exception(f"Branch name not found for project {proj_}")
 
-        per_proj_commit_dict, per_proj_full_defect_list = excavator.runMiner(orgName, proj_, branchName, csv_replication)
+        per_proj_commit_dict, per_proj_full_defect_list = excavator.runMiner(orgName, proj_, branchName, csv_replication, csv_default)
         
         categ += per_proj_full_defect_list
         dic[proj_] = (per_proj_commit_dict, per_proj_full_defect_list)
@@ -101,8 +102,9 @@ if __name__=='__main__':
         csv_replication = os.path.abspath(sys.argv[sys.argv.index("--csv-replication") + 1])
         csv_default     = os.path.abspath(sys.argv[sys.argv.index("--csv-default") + 1])
         
-    pathRepo     = os.path.abspath(constants.DATASET_DIR + orgName + '/')
-    fileName     = pathRepo + constants.REPO_FILE_LIST 
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    pathRepo = script_dir + "/" + constants.DATASET_DIR + "/" + orgName + "/"
+    fileName = pathRepo + "/" + constants.REPO_FILE_LIST
     elgibleRepos = excavator.getEligibleProjects(fileName)
     dic   = {}
     categ = []
