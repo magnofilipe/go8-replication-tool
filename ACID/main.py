@@ -12,6 +12,9 @@ import time
 import datetime
 import sys 
 import git
+import nltk
+nltk.download('punkt')
+nltk.download('punkt_tab')
 
 '''
 This script goes to each repo and mines commits and commit messages and then get the defect category 
@@ -53,10 +56,10 @@ if __name__=='__main__':
     elif flag_arg == "VTEX":
         orgName = "VTEX"
         print('ACID will now run on VTEX repos')
-        output_location = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
-        out_fil_nam     = output_location + '/REPLICATION_ONLY.PKL'
-        out_csv_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.csv'
-        out_pkl_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.PKL'
+        output_location = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
+        out_fil_nam     = output_location + '/VTEX_ONLY.PKL'
+        out_csv_fil     = output_location + '/VTEX_ONLY_CATEG_OUTPUT_FINAL.csv'
+        out_pkl_fil     = output_location + '/VTEX_ONLY_CATEG_OUTPUT_FINAL.PKL'
     else:
       orgName='TEST'
       print('ACID will now run on default testing repos')
@@ -68,20 +71,24 @@ if __name__=='__main__':
         csv_replication = None
         csv_default     = None
     else:
-        csv_replication = os.path.expanduser(sys.argv[sys.argv.index("--csv-replication") + 1])
-        csv_default     = os.path.expanduser(sys.argv[sys.argv.index("--csv-default") + 1])
+        csv_replication = os.path.abspath(sys.argv[sys.argv.index("--csv-replication") + 1])
+        csv_default     = os.path.abspath(sys.argv[sys.argv.index("--csv-default") + 1])
         
-    pathRepo     = os.path.expanduser(constants.DATASET_DIR + orgName + '/')
-    fileName     = pathRepo + constants.REPO_FILE_LIST 
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    pathRepo = script_dir + "/" + constants.DATASET_DIR + "/" + orgName + "/"
+    fileName = pathRepo + "/" + constants.REPO_FILE_LIST
     elgibleRepos = excavator.getEligibleProjects(fileName)
     dic   = {}
     categ = []
     for proj_ in elgibleRepos:
         try:
+            if proj_ == constants.REPO_FILE_LIST:
+                continue
             path_proj = pathRepo + proj_
             branchName = getBranchName(path_proj) 
             per_proj_commit_dict, per_proj_full_defect_list = excavator.runMiner(orgName, proj_, branchName, csv_file_path=csv_replication, csv_default=csv_default)
             categ = categ + per_proj_full_defect_list 
+            print(categ)
             # print proj_ , len(per_proj_full_defect_list) 
             print('Finished analyzing:', proj_)
             dic[proj_] = (per_proj_commit_dict, per_proj_full_defect_list)

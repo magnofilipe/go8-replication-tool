@@ -54,7 +54,7 @@ if __name__=='__main__':
     elif flag_arg == "VTEX":
         orgName = "VTEX"
         print('ACID will now run on VTEX repos')
-        output_location = os.path.expanduser(sys.argv[sys.argv.index("--output") + 1])
+        output_location = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
         out_fil_nam     = output_location + '/REPLICATION_ONLY.PKL'
         out_csv_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.csv'
         out_pkl_fil     = output_location + '/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.PKL'
@@ -98,10 +98,10 @@ if __name__=='__main__':
         csv_replication = None
         csv_default     = None
     else:
-        csv_replication = os.path.expanduser(sys.argv[sys.argv.index("--csv-replication") + 1])
-        csv_default     = os.path.expanduser(sys.argv[sys.argv.index("--csv-default") + 1])
+        csv_replication = os.path.abspath(sys.argv[sys.argv.index("--csv-replication") + 1])
+        csv_default     = os.path.abspath(sys.argv[sys.argv.index("--csv-default") + 1])
         
-    pathRepo     = os.path.expanduser(constants.DATASET_DIR + orgName + '/')
+    pathRepo     = os.path.abspath(constants.DATASET_DIR + orgName + '/')
     fileName     = pathRepo + constants.REPO_FILE_LIST 
     elgibleRepos = excavator.getEligibleProjects(fileName)
     dic   = {}

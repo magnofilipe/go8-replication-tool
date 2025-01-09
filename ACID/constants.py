@@ -4,10 +4,10 @@ Mar 19, 2019
 ACID: Store configuration strings and cosntants here 
 '''
 
-DATASET_DIR  = '/ACID/dataset/' 
+DATASET_DIR  = 'dataset' 
 REPO_FILE_LIST = 'eligible_repos.csv'
 MASTER_BRANCH  = 'main' 
-FILE_READ_MODE = 'rU' 
+FILE_READ_MODE = 'r' 
 AST_PATH = 'EXTRA_AST' 
 PP_EXTENSION = '.pp'
 IAC_FILES = ['Pulumi.yaml', 'Pulumi.yml', 'cdk.json', 'cdktf.json', ".py", ".go", ".js", ".ts", ".pp", ".java", ".tf"]

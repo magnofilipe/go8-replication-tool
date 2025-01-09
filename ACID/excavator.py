@@ -59,11 +59,11 @@ def getPuppRelatedCommits(repo_dir_absolute_path, ppListinRepo, branchName=const
     cmd_of_interrest = cmd_of_interrest1 + cmd_of_interrest2
     commit_of_interest  = str(subprocess.check_output([constants.BASH_CMD, constants.BASH_FLAG, cmd_of_interrest])) #in Python 3 subprocess.check_output returns byte
 
-
     for ppFile in ppListinRepo:
-      # print(ppFile, commit_of_interest)
+      print(ppFile, commit_of_interest)
       if ppFile in commit_of_interest:
         file_with_path = os.path.join(repo_dir_absolute_path, ppFile)
+        print(file_with_path)
         mapped_tuple = (file_with_path, each_commit)
         mappedPuppetList.append(mapped_tuple)
 
@@ -285,7 +285,7 @@ def getIacFilesOfRepo(repo_id, csv_file_path = constants.CSV_REPLICATION, csv_de
                 iac_paths = ast.literal_eval(row['iac_paths'])
                 related_files = ast.literal_eval(row['related_files'])
                 result = iac_paths + related_files
-                result = [item.replace(csv_default + repo_id + '/', '') for item in result]
+                result = [item.replace(csv_default + "/" + repo_id + '/', '') for item in result]
                 return result
     return None, None
 
@@ -293,8 +293,8 @@ def getId(path):
   return path.split('/')[-1]
 
 def runMiner(orgParamName, repo_name_param, branchParam, csv_file_path = None, csv_default = None):
-  
-  repo_path   = os.path.expanduser(constants.DATASET_DIR + orgParamName + "/" + repo_name_param)
+  script_dir = os.path.dirname(os.path.abspath(__file__))
+  repo_path   = script_dir + "/" + constants.DATASET_DIR + "/" + orgParamName + "/" + repo_name_param
   repo_branch = branchParam
 
   if 'mozilla' in orgParamName:
@@ -314,6 +314,8 @@ def runMiner(orgParamName, repo_name_param, branchParam, csv_file_path = None, c
     repo_id = getId(repo_path)
     all_iac_files_in_repo = getIacFilesOfRepo(repo_id, csv_file_path, csv_default)
     iac_commits_in_repo = getPuppRelatedCommits(repo_path, all_iac_files_in_repo, repo_branch)
+    print("IAC: ")
+    print(iac_commits_in_repo)
     commit_file_dict, categ_defect_list = analyzeCommit(repo_path, repo_branch, iac_commits_in_repo)
   else:
     all_pp_files_in_repo = getPuppetFilesOfRepo(repo_path)
