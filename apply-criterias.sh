@@ -47,13 +47,13 @@ echo "Creating CSV directories..." | tee -a $log_file
 mkdir -p csv/criterias-output || handle_error "Failed to create CSV directories"
 
 echo "Generating the CSV with related files..." | tee -a $log_file
-python3 replication/1-related-files-generator.py --input $target_dir --output csv/criterias-output/csv1_files_with_neighbors.csv 2>&1 | tee -a $log_file || handle_error "CSV related files generation failed"
+python3 replication/1-related-files-generator.py --input criterias/criteria4 --output csv/criterias-output/csv1_files_with_neighbors.csv 2>&1 | tee -a $log_file || handle_error "CSV related files generation failed"
 
 echo "Generating the CSV with the commits summary..." | tee -a $log_file
-python3 replication/2-commits-count.py --input csv/criterias-output/csv1_files_with_neighbors.csv --output csv/criterias-output/csv2_iac_commits_summary.csv --dataset-dir $target_dir 2>&1 | tee -a $log_file || handle_error "Commits summary CSV generation failed"
+python3 replication/2-commits-count.py --input csv/criterias-output/csv1_files_with_neighbors.csv --output csv/criterias-output/csv2_iac_commits_summary.csv --dataset-dir criterias/criteria4 2>&1 | tee -a $log_file || handle_error "Commits summary CSV generation failed"
 
 echo "Generating the CSV with the time period..." | tee -a $log_file
-python3 replication/3-time-period.py --input csv/criterias-output/csv2_iac_commits_summary.csv --output csv/criterias-output/csv3_iac_criterias_output.csv --dataset-dir $target_dir 2>&1 | tee -a $log_file || handle_error "Time period CSV generation failed"
+python3 replication/3-time-period.py --input csv/criterias-output/csv2_iac_commits_summary.csv --output csv/criterias-output/csv3_iac_criterias_output.csv --dataset-dir criterias/criteria4 2>&1 | tee -a $log_file || handle_error "Time period CSV generation failed"
 
 echo "Generating the CSV with frequency..." | tee -a $log_file
 python3 replication/4-analyze.py --input csv/criterias-output/csv3_iac_criterias_output.csv --output csv/criterias-output/csv4_iac_output_frequency.csv 2>&1 | tee -a $log_file || handle_error "Frequency CSV generation failed"
