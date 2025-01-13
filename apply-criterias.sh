@@ -60,6 +60,6 @@ echo "Generating the CSV with frequency..." | tee -a $log_file
 python3 replication/4-analyze.py --input csv/criterias-output/csv3_iac_criterias_output.csv --output csv/criterias-output/csv4_iac_output_frequency.csv 2>&1 | tee -a $log_file || handle_error "Frequency CSV generation failed"
 
 echo "Generating criterias frequency csv..." | tee -a $log_file
-python3 replication/criteria-frequency.py --input criterias/criteria1,criterias/criteria2,criterias/criteria3,criterias/criteria4,dataset --output csv/criterias-output/criterias-frequency 2>&1 | tee -a $log_file || handle_error "Criterias frequency CSV generation failed"
+python3 replication/criteria-frequency.py --input criterias/criteria1,criterias/criteria2,criterias/criteria3,criterias/criteria4,$target_dir --output csv/criterias-output/criterias-frequency 2>&1 | tee -a $log_file || handle_error "Criterias frequency CSV generation failed"
 
 echo "Criterias execution completed. Logs saved to $log_file." | tee -a $log_file
