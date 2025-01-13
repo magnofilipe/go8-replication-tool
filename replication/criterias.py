@@ -29,8 +29,6 @@ def iac_percentage(repo_path):
     # Contar todos os arquivos dos diretórios que possuem arquivos IaC
     for iac_dir in iac_directories:
         iac_files += sum(len(files) for _, _, files in os.walk(iac_dir))
-    print(iac_files)
-    print(total_files)
     return (iac_files / total_files) * 100 if total_files > 0 else 0
 
 def commits_per_month(repo_path):
