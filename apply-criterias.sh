@@ -45,6 +45,7 @@ python3 replication/criterias.py --input criterias/criteria3 --output criterias/
 
 echo "Creating CSV directories..." | tee -a $log_file
 mkdir -p csv/criterias-output || handle_error "Failed to create CSV directories"
+mkdir -p csv/criterias-output/criterias-frequency || handle_error "Failed to create CSV directories"
 
 echo "Generating the CSV with related files..." | tee -a $log_file
 python3 replication/1-related-files-generator.py --input criterias/criteria4 --output csv/criterias-output/csv1_files_with_neighbors.csv 2>&1 | tee -a $log_file || handle_error "CSV related files generation failed"
@@ -57,5 +58,8 @@ python3 replication/3-time-period.py --input csv/criterias-output/csv2_iac_commi
 
 echo "Generating the CSV with frequency..." | tee -a $log_file
 python3 replication/4-analyze.py --input csv/criterias-output/csv3_iac_criterias_output.csv --output csv/criterias-output/csv4_iac_output_frequency.csv 2>&1 | tee -a $log_file || handle_error "Frequency CSV generation failed"
+
+echo "Generating criterias frequency csv..." | tee -a $log_file
+python3 replication/criteria-frequency.py --input criterias/criteria1,criterias/criteria2,criterias/criteria3,criterias/criteria4,dataset --output csv/criterias-output/criterias-frequency 2>&1 | tee -a $log_file || handle_error "Criterias frequency CSV generation failed"
 
 echo "Criterias execution completed. Logs saved to $log_file." | tee -a $log_file
