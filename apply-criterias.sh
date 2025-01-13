@@ -1,6 +1,6 @@
 #!/bin/bash
 
-log_file="execution_log.txt"
+log_file="criterias.log"
 default_dir="dataset"
 
 function usage() {
