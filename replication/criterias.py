@@ -4,7 +4,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 # Extensões de arquivos IAC
-iac_extensions = [".tf", "Pulumi.yaml", "Pulumi.yml", "cdk.json", "cdktf.json"]
+iac_extensions = [".tf", "Pulumi.yaml", "Pulumi.yml", "cdk.json", "cdktf.json", ".edn"]
 
 # Funções para os filtros
 def is_not_fork(repo_path):
@@ -21,7 +21,7 @@ def iac_percentage(repo_path):
     iac_directories = set()  # Diretórios que possuem arquivos IaC
 
     for root, _, files in os.walk(repo_path):
-        has_iac_file = any(file.endswith(ext) for file in files for ext in iac_extensions)
+        has_iac_file = any(file_.endswith(ext) for file_ in files for ext in iac_extensions)
         if has_iac_file:
             iac_directories.add(root)
         total_files += len(files)
