@@ -3,23 +3,17 @@ Akond Rahman
 Dec 02, 2018 
 Mar 19, 2019: ACID: Extractor 
 '''
-import os 
-import csv 
-import numpy as np
-import sys
-from git import Repo
+from    nltk.tokenize  import sent_tokenize
+from    git            import Repo
+import  os 
+import  csv 
+import  numpy as np
+import  sys
 import  subprocess
-import time 
-import  datetime 
-import pickle
-from nltk.tokenize import sent_tokenize
-import constants
-import classifier
-import hglib  # reff: https://www.mercurial-scm.org/wiki/PythonHglib
-import re
-
-# reload(sys)
-# sys.setdefaultencoding(constants.ENCODING) 
+import  constants
+import  classifier
+import  ast
+csv.field_size_limit(sys.maxsize)
 
 
 def getEligibleProjects(fileNameParam):
@@ -60,7 +54,6 @@ def getPuppRelatedCommits(repo_dir_absolute_path, ppListinRepo, branchName=const
     commit_of_interest  = str(subprocess.check_output([constants.BASH_CMD, constants.BASH_FLAG, cmd_of_interrest])) #in Python 3 subprocess.check_output returns byte
 
     for ppFile in ppListinRepo:
-      # print(ppFile, commit_of_interest)
       if ppFile in commit_of_interest:
         file_with_path = os.path.join(repo_dir_absolute_path, ppFile)
         mapped_tuple = (file_with_path, each_commit)
@@ -68,16 +61,38 @@ def getPuppRelatedCommits(repo_dir_absolute_path, ppListinRepo, branchName=const
 
   return mappedPuppetList
 
-def getDiffStr(repo_path_p, commit_hash_p, file_p):
-   
-   cdCommand   = constants.CHANGE_DIR_CMD + repo_path_p + " ; "
-   theFile     = os.path.relpath(file_p, repo_path_p)
-   
-   diffCommand = constants.GIT_DIFF_CMD + commit_hash_p + constants.WHITE_SPACE + theFile + constants.WHITE_SPACE
-   command2Run = cdCommand + diffCommand
-   diff_output = subprocess.check_output([constants.BASH_CMD, constants.BASH_FLAG, command2Run])
+def IacRelatedCommits(repo_dir_absolute_path, iac_list_repo, branchName=constants.MASTER_BRANCH):
+  mapped_iac_list = []
+  track_exec_cnt  = 0
+  repo_  = Repo(repo_dir_absolute_path)
+  all_commits = list(repo_.iter_commits(branchName))
+  for each_commit in all_commits:
+    track_exec_cnt = track_exec_cnt + 1
 
-   return diff_output
+    cmd_of_interrest1 = constants.CHANGE_DIR_CMD + repo_dir_absolute_path + " ; "
+    cmd_of_interrest2 = constants.GIT_COMM_CMD_1 + str(each_commit)  +  constants.GIT_COMM_CMD_2
+    cmd_of_interrest = cmd_of_interrest1 + cmd_of_interrest2
+    commit_of_interest  = str(subprocess.check_output([constants.BASH_CMD, constants.BASH_FLAG, cmd_of_interrest])) #in Python 3 subprocess.check_output returns byte
+
+    for iac_file in iac_list_repo:
+      if iac_file in commit_of_interest:
+        file_with_path = os.path.join(repo_dir_absolute_path, iac_file)
+        mapped_tuple = (file_with_path, each_commit)
+        mapped_iac_list.append(mapped_tuple)
+
+  return mapped_iac_list
+
+def getDiffStr(repo_path_p, commit_hash_p, file_p):
+    cdCommand = f"{constants.CHANGE_DIR_CMD} {repo_path_p} ; "
+    theFile = os.path.relpath(file_p, repo_path_p)
+    
+    diffCommand = f"{constants.GIT_SHOW_CMD} {commit_hash_p} -- {theFile}"
+    command2Run = cdCommand + diffCommand
+
+    diff_output = subprocess.check_output(
+        [constants.BASH_CMD, constants.BASH_FLAG, command2Run]
+    ).decode('utf-8')
+    return diff_output
 
 def makeDepParsingMessage(m_, i_): 
     upper, lower  = 0, 0
@@ -91,31 +106,22 @@ def makeDepParsingMessage(m_, i_):
 
 def processMessage(indi_comm_mess):
     splitted_messages = []
-    if ('*' in indi_comm_mess):
+#   original
+#    if ('*' in indi_comm_mess):
+    if ('*' in indi_comm_mess) or (';' in indi_comm_mess):
       splitted_messages = indi_comm_mess.split('*')
+      splitted_messages = indi_comm_mess.split(';')
     else:
       splitted_messages = sent_tokenize(indi_comm_mess)
     return splitted_messages 
 
-def dumpDiffText(commit_repo_path, commit_hash, file_, diff_content_str, text_comm, date_time):
-    dump_str = ''
-    dump_str = dump_str + '='*25 + ':'*3  + commit_repo_path  + ':'*3 + commit_hash + ':'*3 + 'START!' + '='*25
-    dump_str = dump_str +  file_ 
-    dump_str = dump_str +  '*'*10 + '\n'
-    dump_str = dump_str +  text_comm
-    dump_str = dump_str +  '*'*10 + '\n'
-    dump_str = dump_str +  'DECISION===>:'
-    dump_str = dump_str +  '*'*10
-    dump_str = dump_str +  '='*25 + ':'*3   + date_time + ':'*3 + 'END!!!' + '='*25    
-    # print dump_str 
-
-def analyzeCommit(repo_path_param, repo_branch_param, pupp_commits_mapping):
+def analyzeCommit(repo_path_param, iac_commits_mapping):
   verbose = False   # For oracle dataset it is True (later), otherwise it is False 
   pupp_bug_list = []
   all_commit_file_dict  = {}
   all_defect_categ_list = []
   hash_tracker = []
-  for tuple_ in pupp_commits_mapping:
+  for tuple_ in iac_commits_mapping:
 
     file_ = tuple_[0]
     commit_ = tuple_[1]
@@ -156,18 +162,15 @@ def analyzeCommit(repo_path_param, repo_branch_param, pupp_commits_mapping):
         # each commit has multiple messages, need to merge them together in one list here, not in classifier 
         for tokenized_msg in processed_message:
             bug_categ = classifier.detectCateg(tokenized_msg, diff_content_str, verbose)
-            per_commit_defect_categ_list.append(  bug_categ )
-            # if verbose:
-            #   print tokenized_msg
-            #   print commit_hash, bug_categ, repo_path_param, str_time_commit
-            #   print '-'*100   
-            # -- mydebug
-            #if (bug_categ != constants.NO_DEFECT_CATEG):
-            #  print(bug_categ)
+            # bug_categ = classifier.detectCategHashFounder(tokenized_msg, diff_content_str, verbose, hash=commit_hash)
+            if len(bug_categ) == 0:
+              per_commit_defect_categ_list.append(constants.BUGGY_COMMIT)
+            else:
+              per_commit_defect_categ_list += bug_categ 
       else:
-        per_commit_defect_categ_list  = [ constants.NO_DEFECT_CATEG ]
+        per_commit_defect_categ_list  = [constants.NO_DEFECT_CATEG]
 
-      bug_categ_list = np.unique(  per_commit_defect_categ_list  )
+      bug_categ_list = np.unique(per_commit_defect_categ_list)
       '''
       for testing purpose , uncomment only for tool accuracy purpose 
       '''
@@ -188,6 +191,7 @@ def analyzeCommit(repo_path_param, repo_branch_param, pupp_commits_mapping):
       else:    
         tup_ = (commit_hash, constants.NO_DEFECT_CATEG, file_, str_time_commit) 
         all_defect_categ_list.append(tup_)  
+        
       hash_tracker.append(commit_hash) 
     #### file to hash mapping zone 
     if commit_hash not in all_commit_file_dict:
@@ -197,84 +201,6 @@ def analyzeCommit(repo_path_param, repo_branch_param, pupp_commits_mapping):
 
   return all_commit_file_dict, all_defect_categ_list 
 
-def getHgLegitFiles(fileListParam):
-  outputList = []
-  for file_ in fileListParam:
-    tmp_ = file_[4] 
-    if constants.PP_EXTENSION in tmp_:
-      outputList.append(tmp_)
-  return outputList
-
-def getHgPuppetCommitMapping(all_commits_param, legit_files_param, bashCommand):
-  listToRet = []
-  for e in  all_commits_param:
-    commit_hash = e[1]
-    timestamp   = e[-1]
-    message     = e[-2]
-    diffCommand = bashCommand + commit_hash #reff: https://stackoverflow.com/questions/5376642/mercurial-diffs-in-a-particular-changeset
-    diff_output = subprocess.check_output([ constants.BASH_CMD , constants.BASH_FLAG, diffCommand])
-
-    for legitFile in legit_files_param:
-      if(legitFile in diff_output):
-        tmp_tup = (commit_hash, legitFile, timestamp, message, diff_output)
-        listToRet.append(tmp_tup)
-  return listToRet
-
-
-def analyzeHgCommit(repo_path_param, repo_branch_param, pupp_commits_mapping):
-  pupp_bug_list = []
-  all_commit_file_dict  = {}
-  all_defect_categ_list = []
-  hash_tracker = []
-  full_str_for_sanity = ''
-  for tuple_ in pupp_commits_mapping:
-
-    commit_hash      = tuple_[0]
-    commit_file      = tuple_[1]
-    timestamp_commit = tuple_[2]
-    str_time_commit  = timestamp_commit.strftime(constants.DATE_TIME_FORMAT)    
-    msg_commit       = tuple_[3] 
-
-    msg_commit = msg_commit.replace('\n', constants.WHITE_SPACE)
-    msg_commit = msg_commit.replace(',',  ';')    
-    msg_commit = msg_commit.replace('\t', constants.WHITE_SPACE)
-    msg_commit = msg_commit.replace('&',  ';')  
-    msg_commit = msg_commit.replace('#',  constants.WHITE_SPACE)
-    msg_commit = msg_commit.replace('=',  constants.WHITE_SPACE)      
-
-    diff_content_str = tuple_[4]
-
-    #### categorization zone 
-    per_commit_defect_categ_list = []
-    if (commit_hash not in hash_tracker):
-      bug_status, index_status = classifier.detectBuggyCommit(msg_commit) 
-      if (bug_status) or (classifier.detectRevertedCommit(msg_commit) ) or len(diff_content_str) > 0:
-        processed_message = processMessage(msg_commit)
-        for tokenized_msg in processed_message:
-            bug_categ = classifier.detectCateg(tokenized_msg, diff_content_str)
-            per_commit_defect_categ_list.append(  bug_categ )
-      else:
-        per_commit_defect_categ_list  = [ constants.NO_DEFECT_CATEG ]
-
-      bug_categ_list = np.unique(  per_commit_defect_categ_list  )
-      if (len(bug_categ_list) > 0):
-        for bug_categ_ in bug_categ_list:      
-            tup_ = (commit_hash, bug_categ_, repo_path_param, str_time_commit) 
-            print(tup_)
-            all_defect_categ_list.append(tup_)  
-      else:    
-        tup_ = (commit_hash, constants.NO_DEFECT_CATEG, repo_path_param, str_time_commit) 
-        all_defect_categ_list.append(tup_)  
-      hash_tracker.append(commit_hash) 
-    #### file to hash mapping zone 
-    if commit_hash not in all_commit_file_dict:
-      all_commit_file_dict[commit_hash] = [commit_file]
-    else:
-      all_commit_file_dict[commit_hash]  = all_commit_file_dict[commit_hash] + [commit_file]    
-
-  return all_commit_file_dict, all_defect_categ_list 
-
-import ast
 def getIacFilesOfRepo(repo_id, csv_file_path = constants.CSV_REPLICATION, csv_default = constants.CSV_DEFAULT_PATH):
     with open(csv_file_path, 'r', encoding='utf-8') as csv_file:
         reader = csv.DictReader(csv_file)
@@ -296,33 +222,11 @@ def runMiner(orgParamName, repo_name_param, branchParam, csv_file_path = None, c
   repo_path   = script_dir + "/" + constants.DATASET_DIR + "/" + orgParamName + "/" + repo_name_param
   repo_branch = branchParam
 
-  if 'mozilla' in orgParamName:
-    bashCommand= constants.CHANGE_DIR_CMD + repo_path  + constants.HG_REV_SPECL_CMD 
-    repo_complete = hglib.open(repo_path)
-    files = list(repo_complete.manifest())
-    pp_files =getHgLegitFiles(files)
-    all_commits = repo_complete.log()
-    pupp_commits_in_repo = getHgPuppetCommitMapping(all_commits, pp_files, bashCommand)
-    commit_file_dict, categ_defect_list = analyzeHgCommit(repo_path, repo_branch, pupp_commits_in_repo)
-  elif 'PIPR-replication' in orgParamName:
-    repo_id = getId(repo_path)
-    all_iac_files_in_repo = getIacFilesOfRepo(repo_id)
-    iac_commits_in_repo = getPuppRelatedCommits(repo_path, all_iac_files_in_repo, repo_branch)
-    commit_file_dict, categ_defect_list = analyzeCommit(repo_path, repo_branch, iac_commits_in_repo)
-  elif 'VTEX' in orgParamName:
-    repo_id = getId(repo_path)
-    all_iac_files_in_repo = getIacFilesOfRepo(repo_id, csv_file_path, csv_default)
-    iac_commits_in_repo = getPuppRelatedCommits(repo_path, all_iac_files_in_repo, repo_branch)
-    commit_file_dict, categ_defect_list = analyzeCommit(repo_path, repo_branch, iac_commits_in_repo)
-  else:
-    all_pp_files_in_repo = getPuppetFilesOfRepo(repo_path)
-#    print(all_pp_files_in_repo)	  
-    rel_path_pp_files = getRelPathOfFiles(all_pp_files_in_repo, repo_path)
-#    print(rel_path_pp_files)
-    pupp_commits_in_repo = getPuppRelatedCommits(repo_path, rel_path_pp_files, repo_branch)
-#    print(pupp_commits_in_repo)
-    commit_file_dict, categ_defect_list = analyzeCommit(repo_path, repo_branch, pupp_commits_in_repo)
-    # print 'Commit count:', len(commit_file_dict) 
+  repo_id = getId(repo_path)
+  all_iac_files_in_repo = getIacFilesOfRepo(repo_id, csv_file_path, csv_default)
+  iac_commits_in_repo = IacRelatedCommits(repo_path, all_iac_files_in_repo, repo_branch)
+  commit_file_dict, categ_defect_list = analyzeCommit(repo_path, iac_commits_in_repo)
+
   return commit_file_dict, categ_defect_list
 
   
