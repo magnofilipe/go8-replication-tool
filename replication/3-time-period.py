@@ -4,6 +4,8 @@ import csv
 from datetime import datetime
 import sys
 
+csv.field_size_limit(sys.maxsize)
+
 def get_commit_time_period(repo_path, file_paths):
     """
     Obtém o commit mais antigo e o mais recente para uma lista de arquivos em um repositório Git.
@@ -25,13 +27,21 @@ def get_commit_time_period(repo_path, file_paths):
         print(f"[ERROR] Erro ao executar git log no repositório '{repo_path}': {e}")
         return None, None
 
-    # Converte as datas para objetos datetime
-    commit_dates = [datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z") for date in commit_dates]
+    # Converte as datas para objetos datetime, ignorando entradas inválidas
+    valid_dates = []
+    for date in commit_dates:
+        try:
+            valid_dates.append(datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z"))
+        except ValueError as e:
+            print(f"[WARNING] Data inválida '{date}' encontrada em {repo_path}: {e}")
+            continue
 
-    if not commit_dates:
+    if not valid_dates:  # Verifica se há datas válidas
+        print(f"[WARNING] Nenhuma data válida encontrada para os arquivos em '{repo_path}'.")
         return None, None
 
-    return min(commit_dates), max(commit_dates)
+    return min(valid_dates), max(valid_dates)
+
 
 def process_time_period(input_csv, output_csv, dataset_dir):
     """
@@ -47,20 +57,34 @@ def process_time_period(input_csv, output_csv, dataset_dir):
             repo_id = row["id"]
             iac_type = row["iac_type"]
             iac_paths = eval(row["iac_paths"])  # Coluna com paths dos arquivos IaC
-#           repo_path = f"/home/aluno/filtered-repositories-iac-criteria/criteria4/{repo_id}"
             repo_path = f"{dataset_dir}/{repo_id}"
 
-            # Obtemos o período de tempo para os arquivos IaC
-            oldest_commit, newest_commit = get_commit_time_period(repo_path, iac_paths)
-            if oldest_commit and newest_commit:
-                commit_time_period = (newest_commit - oldest_commit).days
-            else:
-                commit_time_period = None
+            try:
+                # Obtemos o período de tempo para os arquivos IaC
+                oldest_commit, newest_commit = get_commit_time_period(repo_path, iac_paths)
 
-            # Adiciona as informações ao CSV
-            row["oldest_commit"] = oldest_commit.strftime("%Y-%m-%d %H:%M:%S %z") if oldest_commit else "N/A"
-            row["newest_commit"] = newest_commit.strftime("%Y-%m-%d %H:%M:%S %z") if newest_commit else "N/A"
-            row["commit_time_period"] = commit_time_period
+                if oldest_commit and newest_commit:
+                    # Garante que as datas sejam objetos datetime
+                    if isinstance(oldest_commit, str):
+                        oldest_commit = datetime.strptime(oldest_commit, "%Y-%m-%d %H:%M:%S %z")
+                    if isinstance(newest_commit, str):
+                        newest_commit = datetime.strptime(newest_commit, "%Y-%m-%d %H:%M:%S %z")
+
+                    commit_time_period = (newest_commit - oldest_commit).days
+                else:
+                    commit_time_period = None
+
+                # Adiciona as informações ao CSV
+                row["oldest_commit"] = oldest_commit.strftime("%Y-%m-%d %H:%M:%S %z") if oldest_commit else "N/A"
+                row["newest_commit"] = newest_commit.strftime("%Y-%m-%d %H:%M:%S %z") if newest_commit else "N/A"
+                row["commit_time_period"] = commit_time_period
+
+            except Exception as e:
+                print(f"[ERROR] Erro ao processar o repositório '{repo_id}': {e}")
+                row["oldest_commit"] = "N/A"
+                row["newest_commit"] = "N/A"
+                row["commit_time_period"] = "N/A"
+
             writer.writerow(row)
 
 
