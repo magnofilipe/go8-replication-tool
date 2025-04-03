@@ -11,12 +11,14 @@ def classify_technology_in_directory(repo_path):
     """
     for root, _, files in os.walk(repo_path):
         for f in files:
-            if f in {"Pulumi.yaml", "Pulumi.yml"}:
+            if f.endswith("Pulumi.yaml") or f.endswith("Pulumi.yml"):
                 return "Pulumi"
-            elif f == "cdktf.json":
+            elif f.endswith("cdktf.json") or f.endswith(".tf"):
                 return "Terraform"
-            elif f == "cdk.json":
+            elif f.endswith("cdk.json"):
                 return "AWS CDK"
+            elif f.endswith(".edn"):
+                return "NUBANK"
     return "NOTFOUND"
 
 
@@ -24,7 +26,7 @@ def process_criteria(criteria_dir, output_dir):
     """
     Process a single criteria directory to classify technologies.
     """
-    technology_counts = {"Pulumi": 0, "Terraform": 0, "AWS CDK": 0, "NOTFOUND": 0}
+    technology_counts = {"Pulumi": 0, "Terraform": 0, "AWS CDK": 0, "NUBANK": 0, "NOTFOUND": 0}
     results = []
 
     # Iterate over the subdirectories in the criteria directory
