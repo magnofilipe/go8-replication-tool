@@ -38,33 +38,32 @@ if __name__=='__main__':
     print('Started at:', giveTimeStamp()) 
     print('*'*100)
 
-    flag_arg = sys.argv[1] 
+    flag_arg = sys.argv[sys.argv.index("--flag-arg") + 1]
     if flag_arg == '-x': 
        orgName='EXTRA'
        print('ACID will now run on extra testing repos')
-       out_fil_nam = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/EXTRA_TEST_ONLY.PKL'
-       out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/EXTRA_TEST_ONLY_CATEG_OUTPUT_FINAL.csv'
-       out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/EXTRA_TEST_ONLY_CATEG_OUTPUT_FINAL.PKL'
+       out_fil_nam = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/EXTRA2_TEST_ONLY.PKL'
+       out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/EXTRA2_TEST_ONLY_CATEG_OUTPUT_FINAL.csv'
+       out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/EXTRA2_TEST_ONLY_CATEG_OUTPUT_FINAL.PKL'
     elif flag_arg == "-replication":
         orgName = 'PIPR-replication'
         print('ACID will now run on PIPr Replication repos')
-        out_fil_nam = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ECM_ONLY.PKL'
-        out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ECM_ONLY_CATEG_OUTPUT_FINAL.csv'
-        out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ECM_ONLY_CATEG_OUTPUT_FINAL.PKL'
-    elif flag_arg == "VTEX":
-        orgName = "VTEX"
-        print('ACID will now run on VTEX repos')
-        output_location = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
-        out_fil_nam     = output_location + '/VTEX_ONLY.PKL'
-        out_csv_fil     = output_location + '/VTEX_ONLY_CATEG_OUTPUT_FINAL.csv'
-        out_pkl_fil     = output_location + '/VTEX_ONLY_CATEG_OUTPUT_FINAL.PKL'
+        out_fil_nam = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ONLY.PKL'
+        out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.csv'
+        out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/REPLICATION_ONLY_CATEG_OUTPUT_FINAL.PKL'
+    elif flag_arg == "-t":
+        orgName='TEST'
+        print('ACID will now run on default testing repos')
+        out_fil_nam = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST2_ONLY.PKL'
+        out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST2_ONLY_CATEG_OUTPUT_FINAL.csv'
+        out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST2_ONLY_CATEG_OUTPUT_FINAL.PKL' 
     else:
-      orgName='TEST'
-      print('ACID will now run on default testing repos')
-      out_fil_nam = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST_ONLY.PKL'
-      out_csv_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST_ONLY_CATEG_OUTPUT_FINAL.csv'
-      out_pkl_fil = '/home/aluno/ACID-dataset/ARTIFACT/OUTPUT/TEST_ONLY_CATEG_OUTPUT_FINAL.PKL' 
-
+        orgName = flag_arg
+        print(f'ACID will now run on {flag_arg} repos')
+        output_location = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
+        out_fil_nam     = output_location + f'/{flag_arg}_ONLY.PKL'
+        out_csv_fil     = output_location + f'/{flag_arg}_CATEG_OUTPUT_FINAL.csv'
+        out_pkl_fil     = output_location + f'/{flag_arg}_ONLY_CATEG_OUTPUT_FINAL.PKL'
     def process_project(orgName, proj_, pathRepo, dic, categ, csv_replication, csv_default):
      try:
         if proj_ == constants.REPO_FILE_LIST: return
@@ -95,7 +94,7 @@ if __name__=='__main__':
             except Exception as e:
                 print(f"Task raised an exception: {e}")
     
-    if orgName != 'VTEX':
+    if orgName == 'EXTRA' or orgName == "TEST" or orgName == "PIPR-replication":
         csv_replication = None
         csv_default     = None
     else:
