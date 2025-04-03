@@ -3,15 +3,18 @@ from datetime import datetime
 import os
 import sys
 
+csv.field_size_limit(sys.maxsize)
+
 def analyze_csv(file_path, output_csv):
     results = {
         "TOTAL": {"repos": 0, "commits": 0, "iac_files": 0, "iac_commits": 0, "time_period": None},
         "Terraform": {"repos": 0, "commits": 0, "iac_files": 0, "iac_commits": 0, "time_period": None},
         "Pulumi": {"repos": 0, "commits": 0, "iac_files": 0, "iac_commits": 0, "time_period": None},
         "AWS CDK": {"repos": 0, "commits": 0, "iac_files": 0, "iac_commits": 0, "time_period": None},
+        "NUBANK": {"repos": 0, "commits": 0, "iac_files": 0, "iac_commits": 0, "time_period": None}
     }
 
-    time_periods = {"TOTAL": [], "Terraform": [], "Pulumi": [], "AWS CDK": []}
+    time_periods = {"TOTAL": [], "Terraform": [], "Pulumi": [], "AWS CDK": [], "NUBANK": []}
 
     with open(file_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -29,12 +32,15 @@ def analyze_csv(file_path, output_csv):
 
 
             category = "TOTAL"
-            if "terraform" in repo_name.lower():
+            if "terraform" == repo_name.lower():
                 category = "Terraform"
-            elif "pulumi" in repo_name.lower():
+            elif "pulumi" == repo_name.lower():
                 category = "Pulumi"
-            elif "cdk" in repo_name.lower():
+            elif "aws cdk" == repo_name.lower():
                 category = "AWS CDK"
+            elif "nubank" == repo_name.lower():
+                category = "NUBANK"
+            print(repo_name)
 
             # Atualizar métricas
             results[category]["repos"] += 1
