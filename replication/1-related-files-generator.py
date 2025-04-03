@@ -4,18 +4,30 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 import sys
 
-# vou ler o diretorio de criteria 4
+csv.field_size_limit(sys.maxsize)
+
+# Definição dos arquivos e extensões permitidas por tecnologia
 IAC_FILES = {
-    "Pulumi": ["Pulumi.yaml", "Pulumi.yml"],
-    "Terraform": ["cdktf.json"],
-    "AWS CDK": ["cdk.json"]
-}  
-ALLOWED_EXTENSIONS = [".py", ".go", ".js", ".ts", ".rb", ".java", ".tf"] 
-# 1° Iac Files With Neighbors
-# OUTPUT_CSV = "iac_files_with_neighbors.csv"    
+    "Pulumi": {
+        "patterns": ["Pulumi.yaml", "Pulumi.yml"],
+        "extensions": [".js", ".ts", ".py", ".go", ".cs", ".fs", ".vb", ".java"]
+    },
+    "Terraform": {
+        "patterns": ["cdktf.json", ".tf"],
+        "extensions": [".ts", ".py", ".java", ".cs", ".go"]
+    },
+    "AWS CDK": {
+        "patterns": ["cdk.json"],
+        "extensions": [".cpp", ".go", ".java", ".js", ".kt", ".cs", ".ts", ".php", ".py", ".rb", ".rs", ".swift", ".abap"]
+    },
+    "NUBANK":   {
+        "patterns": [".edn"],
+        "extensions": [".edn"]
+    }
+}
 
 def process_directory(parent_dir, subdir_name):
-    """Processa um diretório pai e identifica os arquivos IaC e vizinhos."""
+    """Processa um diretório pai e identifica os arquivos IaC e vizinhos compatíveis."""
     subdir_path = os.path.join(parent_dir, subdir_name)
     iac_data = {
         "id": subdir_name,
@@ -28,30 +40,33 @@ def process_directory(parent_dir, subdir_name):
 
     # Percorre arquivos no diretório pai
     for dirpath, _, filenames in os.walk(subdir_path):
-        # Verifica se há arquivos IaC no diretório atual
-        for iac_type, file_names in IAC_FILES.items():
-            found_iac_files = [f for f in filenames if f in file_names]
+        for iac_type, details in IAC_FILES.items():
+            found_iac_files = [
+                f for f in filenames
+                if any(f == pattern or f.endswith(pattern) for pattern in details["patterns"])
+            ]
             if found_iac_files:
-                # Adiciona o tipo e os caminhos dos arquivos IaC encontrados
+                # Define o tipo de IaC identificado e adiciona seus arquivos
                 iac_data["iac_type"] = iac_type
                 iac_data["iac_paths"].extend(
                     [os.path.join(dirpath, f) for f in found_iac_files]
                 )
 
-                # Adiciona arquivos vizinhos relevantes
+                # Captura arquivos vizinhos compatíveis apenas com a tecnologia correspondente
+                allowed_extensions = details["extensions"]
                 neighbor_files = [
                     os.path.join(dirpath, f)
                     for f in filenames
-                    if os.path.splitext(f)[1] in ALLOWED_EXTENSIONS
+                    if os.path.splitext(f)[1] in allowed_extensions
                 ]
                 iac_data["related_files"].extend(neighbor_files)
 
     print(f"[DEBUG] Resultados para ID '{subdir_name}': {iac_data}")
     return iac_data
 
-def find_iac_files_with_neighbors_parallel(root_dir, MAX_THREADS = 8):
+def find_iac_files_with_neighbors_parallel(root_dir, MAX_THREADS=8):
     """Procura arquivos IaC e seus vizinhos usando paralelização."""
-    iac_results = []  # Lista para armazenar os resultados
+    iac_results = []
     parent_dirs = [d for d in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, d))]
 
     print(f"[DEBUG] Diretórios identificados: {parent_dirs}")
@@ -59,7 +74,6 @@ def find_iac_files_with_neighbors_parallel(root_dir, MAX_THREADS = 8):
     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         tasks = [executor.submit(process_directory, root_dir, subdir) for subdir in parent_dirs]
 
-        # Coleta os resultados das threads
         for future in tasks:
             iac_results.append(future.result())
 
@@ -76,13 +90,13 @@ def save_to_csv(data, output_file):
             writer.writerow({
                 "id": entry["id"],
                 "iac_type": entry["iac_type"] if entry["iac_type"] else "None",
-                "iac_paths": json.dumps(entry["iac_paths"]),  # Encapsula os caminhos em JSON
-                "related_files": json.dumps(entry["related_files"])  # Encapsula os vizinhos em JSON
+                "iac_paths": json.dumps(entry["iac_paths"]),
+                "related_files": json.dumps(entry["related_files"])
             })
     print(f"[DEBUG] Resultados salvos com sucesso em {output_file}")
 
 if __name__ == "__main__":
-    if not "--input" in sys.argv or not "--output" in sys.argv:
+    if "--input" not in sys.argv or "--output" not in sys.argv:
         print("Usage: python3 1-related-files-generator.py --input path --output path -t number_threads")
         sys.exit(1)
     
@@ -90,7 +104,7 @@ if __name__ == "__main__":
     output = os.path.abspath(sys.argv[sys.argv.index("--output") + 1])
 
     if "-t" in sys.argv:
-        n_threads = sys.argv[sys.argv.index("-t") + 1]
+        n_threads = int(sys.argv[sys.argv.index("-t") + 1])
         iac_data = find_iac_files_with_neighbors_parallel(root_dir, n_threads)
     else:
         iac_data = find_iac_files_with_neighbors_parallel(root_dir)
