@@ -46,7 +46,7 @@ fi
 
 # The following command can prevent parallelism errors
 # It increases the limit of open files
-# ulimit -n 4096
+ulimit -n 4096
 
 mkdir -p "$target_dir"
 echo "Destination directory created at ($target_dir)"
