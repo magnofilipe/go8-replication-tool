@@ -43,20 +43,28 @@ def filterTextList(txt_lis):
     return return_list
 
 def getAddDelLines(diff_mess):
-    added_text , deleted_text = [], []    
-    # print(diff_mess, type(diff_mess)) 
-    diff_mess_str = str(diff_mess) ## changes for Python 3 migration 
-    for diff_ in whatthepatch.parse_patch(diff_mess_str):
-        all_changes_line_by_line = diff_[1] ## diff_ is a tuple, changes is idnetified by the second index 
-        if all_changes_line_by_line is not None:
-            for change_tuple in all_changes_line_by_line:
-                if (change_tuple[0] != None ):
-                    added_text.append(change_tuple[2])
-                if (change_tuple[1] != None ):
-                    deleted_text.append(change_tuple[2])
-    # print added_text 
-    # print deleted_text
-    # print '#'*10 
+    added_text, deleted_text = [], []
+    diff_mess_str = str(diff_mess)
+    try:
+        for diff_ in whatthepatch.parse_patch(diff_mess_str):
+            all_changes_line_by_line = getattr(diff_, "changes", None)
+
+            if all_changes_line_by_line:
+                for change in all_changes_line_by_line:
+                    if change.new is not None:
+                        added_text.append(change.line)
+
+                    if change.old is not None:
+                        deleted_text.append(change.line) 
+
+    except Exception as e:
+        print(f"[ERROR] Error when processing diff: {e}")
+
+    if added_text or deleted_text:
+        print("[SUCCESS] Added lines:", added_text)
+        print("[SUCCESS] Deleted lines:", deleted_text)
+        print('#' * 10)
+
     return added_text, deleted_text
 
 def getSpecialConfigDict(text_str_list, splitter):
@@ -72,10 +80,10 @@ def getSpecialConfigDict(text_str_list, splitter):
     return dic2ret
 
 def filterConfig(oldValue):
-    oldValue = oldValue.replace(',', '')
+    oldValue = oldValue.replace(",","")
     oldValue = oldValue.replace("'","")
     oldValue = oldValue.replace(";","")
-    val_     = oldValue.replace('>', '')
+    val_     = oldValue.replace(">","")
 
     return val_ 
 
@@ -106,34 +114,6 @@ def checkDiffForConfigDefects(diff_text):
     added_text   = filterTextList(added_text)
     deleted_text = filterTextList(deleted_text)
     config_change_tracker = 0 
-    # if( any(x_ in added_text for x_ in constants.config_defect_kw_list) ) and ( any(x_ in deleted_text for x_ in constants.config_defect_kw_list) ):
-    #         final_flag = True 
-    # elif ( any(constants.VAR_SIGN in x_ for x_ in added_text) ) and ( any(constants.VAR_SIGN in x_ for x_ in deleted_text) ): ## for variables 
-    #         var_add_lis = [x_.replace(constants.WHITE_SPACE, '').split(constants.VAR_SIGN)[0] for x_ in added_text if constants.VAR_SIGN in x_ ]
-    #         var_del_lis = [x_.replace(constants.WHITE_SPACE, '').split(constants.VAR_SIGN)[0] for x_ in deleted_text if constants.VAR_SIGN in x_ ] 
-    #         var_common  = list(set(var_add_lis).intersection(var_del_lis)) 
-    #         if len(var_common) > 0:
-    #             final_flag = True
-    # elif ( any(constants.ATTR_SIGN in x_ for x_ in added_text) ) and ( any(constants.ATTR_SIGN in x_ for x_ in deleted_text) ): ## for attributes 
-    #         attr_add_lis = [x_.replace(constants.WHITE_SPACE, '').split(constants.ATTR_SIGN)[0] for x_ in added_text if constants.ATTR_SIGN in x_ ]
-    #         attr_del_lis = [x_.replace(constants.WHITE_SPACE, '').split(constants.ATTR_SIGN)[0] for x_ in deleted_text if constants.ATTR_SIGN in x_ ] 
-    #         attr_common  = list(set(attr_add_lis).intersection(attr_del_lis)) 
-    #         if len(attr_common) > 0:
-    #             final_flag = True
-    # if ( any(constants.ATTR_SIGN in x_ for x_ in added_text) ) and ( any(constants.ATTR_SIGN in x_ for x_ in deleted_text) ): ## for RHS comparisons, detect msi matches, and they are indicative of code changes 
-    #         attr_add_lis   = [x_.replace(constants.WHITE_SPACE, '').split(constants.ATTR_SIGN)[1] for x_ in added_text if constants.ATTR_SIGN in x_ ]
-    #         attr_del_lis   = [x_.replace(constants.WHITE_SPACE, '').split(constants.ATTR_SIGN)[1] for x_ in deleted_text if constants.ATTR_SIGN in x_ ] 
-    #         mismatches_del = [x_ for x_ in attr_del_lis if x_ not in attr_add_lis]
-    #         mismatches_add = [x_ for x_ in attr_add_lis if x_ not in attr_del_lis]
-    #         if (len(mismatches_add) > 0) or (len(mismatches_del) > 0):
-    #             final_flag = True
-    # elif ( any(constants.VAR_SIGN in x_ for x_ in added_text) ) and ( any(constants.VAR_SIGN in x_ for x_ in deleted_text) ): ## for RHS comparisons, detect msi matches, and they are indicative of code changes 
-    #         attr_add_lis   = [x_.replace(constants.WHITE_SPACE, '').split(constants.VAR_SIGN)[1] for x_ in added_text if constants.VAR_SIGN in x_ ]
-    #         attr_del_lis   = [x_.replace(constants.WHITE_SPACE, '').split(constants.VAR_SIGN)[1] for x_ in deleted_text if constants.VAR_SIGN in x_ ] 
-    #         mismatches_del = [x_ for x_ in attr_del_lis if x_ not in attr_add_lis]
-    #         mismatches_add = [x_ for x_ in attr_add_lis if x_ not in attr_del_lis]
-    #         if (len(mismatches_add) > 0) or (len(mismatches_del) > 0):
-    #             final_flag = True
 
     valu_assi_dict_addi = getSpecialConfigDict(added_text, constants.VAR_SIGN)
     valu_assi_dict_deli = getSpecialConfigDict(deleted_text, constants.VAR_SIGN)
@@ -181,10 +161,11 @@ def checkDiffForDocDefects(diff_text):
             for change_tuple in all_changes_line_by_line:
                 content = change_tuple[2] 
                 content = content.replace(constants.WHITE_SPACE, '')
-                if (change_tuple[0] != None ) and ( content.startswith(constants.HASH_SYMBOL) ):
+                if (change_tuple[0] != None ) and (content.startswith(symbol) for symbol in constants.comments_elems):
                     line_numbers_added.append( content )
-                if (change_tuple[1] != None ) and ( content.startswith(constants.HASH_SYMBOL)  ):
-                    line_numbers_deleted.append( content ) 
+                
+                if (change_tuple[1] != None ) and (content.startswith(symbol) for symbol in constants.comments_elems):
+                    line_numbers_deleted.append( content )                 
         lines_changed = list(set(line_numbers_added).intersection(line_numbers_deleted)) 
         # print lines_changed
     lines_changed = [x_ for x_ in lines_changed if len(x_) > 1 ]
@@ -192,6 +173,37 @@ def checkDiffForDocDefects(diff_text):
         final_flag = True
     return final_flag
 
+def checkDiffForNetwork(diff_text):
+    added_text, deleted_text = [], []
+    final_flag = False 
+    added_text, deleted_text = getAddDelLines(diff_text)
+
+    added_text = filterTextList(added_text)
+    deleted_text = filterTextList(deleted_text)
+
+    added_text = [line for line in added_text if any(keyword in line for keyword in constants.diff_network_elems)]
+    deleted_text = [line for line in deleted_text if any(keyword in line for keyword in constants.diff_network_elems)]
+
+    if added_text or deleted_text:
+        final_flag = True
+
+    return final_flag
+
+def checkDiffForCredentials(diff_text):
+    added_text, deleted_text = [], []
+    final_flag = False 
+    added_text, deleted_text = getAddDelLines(diff_text)
+
+    added_text = filterTextList(added_text)
+    deleted_text = filterTextList(deleted_text)
+
+    added_text = [line for line in added_text if any(keyword in line for keyword in constants.diff_credentials_kw_list)]
+    deleted_text = [line for line in deleted_text if any(keyword in line for keyword in constants.diff_credentials_kw_list)]
+
+    if added_text or deleted_text:
+        final_flag = True
+
+    return final_flag
     
 def checkDiffForLogicDefects(diff_text):
     added_text , deleted_text = [], []
@@ -294,7 +306,9 @@ def checkDiffForSyntaxDefects(diff_text):
     if ((len(attr_added_text)) == (len(attr_deleted_text))) or (len(var_added_text) == len(var_deleted_text) ) : ## right logic , same number of additions and deletiosn for variables 
         final_flag = True 
     elif ( (matchStringsFuzzily(attr_added_text, attr_deleted_text) > constants.lev_cutoff ) or (matchStringsFuzzily(var_added_text, var_deleted_text) > constants.lev_cutoff ) ):
-        final_flag - True 
+        # Why does the original author uses minus?
+        # final_flag - True 
+        final_flag = True
 
 
     return final_flag
