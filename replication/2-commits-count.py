@@ -3,6 +3,8 @@ import subprocess
 import csv
 import sys
 
+csv.field_size_limit(sys.maxsize)
+
 def count_commits_for_files(repo_path, file_paths):
     """
     Conta o número de commits relacionados a uma lista de arquivos em um repositório Git de forma sequencial.
@@ -42,11 +44,16 @@ def process_repositories_and_commits(input_csv, output_csv, dataset_dir):
             repo_id = row["id"]
             iac_paths = eval(row["iac_paths"])  # Supondo que você tenha os paths no formato de lista na coluna
             related_files = eval(row["related_files"])  # Coluna com os arquivos relacionados
-#           repo_path = f"/home/aluno/filtered-repositories-iac-criteria/criteria4/{repo_id}" 
+            iac_paths = [path for path in iac_paths if path]
+            related_files = [path for path in related_files if path]
+            if not iac_paths and not related_files:
+                print(f"[INFO] Ignorando repositório {repo_id} porque não há arquivos válidos.")
+                continue
             repo_path = f"{dataset_dir}/{repo_id}"
-            print(repo_path)
-            # Contar commits para arquivos IaC
-            commit_count = count_commits_for_files(repo_path, iac_paths + related_files)
+            file_paths = iac_paths + related_files
+            print(f"[DEBUG] Processando repositório {repo_path}")
+            print(file_paths)
+            commit_count = count_commits_for_files(repo_path, file_paths)
 
             # Contar commits do repositório inteiro
             cmd = ["git", "-C", repo_path, "log", "--pretty=%H"]
