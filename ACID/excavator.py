@@ -149,7 +149,6 @@ def analyzeCommit(repo_path_param, iac_commits_mapping):
     timestamp_commit = commit_.committed_datetime
     str_time_commit  = timestamp_commit.strftime(constants.DATE_TIME_FORMAT) ## date with time 
 
-    diff_content_str = getDiffStr(repo_path_param, commit_hash, file_)
     #### categorization zone 
     per_commit_defect_categ_list = []
     if (commit_hash not in hash_tracker):
@@ -161,12 +160,13 @@ def analyzeCommit(repo_path_param, iac_commits_mapping):
         processed_message = processMessage(msg_commit)
         # each commit has multiple messages, need to merge them together in one list here, not in classifier 
         for tokenized_msg in processed_message:
+            diff_content_str = getDiffStr(repo_path_param, commit_hash, file_)
             bug_categ = classifier.detectCateg(tokenized_msg, diff_content_str, verbose)
             # bug_categ = classifier.detectCategHashFounder(tokenized_msg, diff_content_str, verbose, hash=commit_hash)
             if len(bug_categ) == 0:
               per_commit_defect_categ_list.append(constants.BUGGY_COMMIT)
             else:
-              per_commit_defect_categ_list += bug_categ 
+              per_commit_defect_categ_list.append(bug_categ)
       else:
         per_commit_defect_categ_list  = [constants.NO_DEFECT_CATEG]
 

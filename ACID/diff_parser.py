@@ -60,11 +60,6 @@ def getAddDelLines(diff_mess):
     except Exception as e:
         print(f"[ERROR] Error when processing diff: {e}")
 
-    if added_text or deleted_text:
-        print("[SUCCESS] Added lines:", added_text)
-        print("[SUCCESS] Deleted lines:", deleted_text)
-        print('#' * 10)
-
     return added_text, deleted_text
 
 def getSpecialConfigDict(text_str_list, splitter):

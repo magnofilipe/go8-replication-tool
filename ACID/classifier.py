@@ -73,7 +73,7 @@ def detectRevertedCommit(msg_):
     return flag2ret
 
 def categ_check(key_words=[], msg=None, diff_function=None, diff=None, classification=constants.NO_DEFECT_CATEG):
-    if any(_ in msg for _ in key_words) or (diff_function != None and diff_function(diff)):
+    if any(kw in msg for kw in key_words) or (diff_function != None and diff_function(diff)):
         return classification
     return constants.NO_DEFECT_CATEG
 '''

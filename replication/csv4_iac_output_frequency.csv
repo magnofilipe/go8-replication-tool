@@ -1,5 +1,0 @@
-category,type,repos,total_commits,iac_files,iac_commits,time_period
-TOTAL,,344,274467,7056,11153,2017-09-04 - 2024-10-18
-Terraform,Git,16,19940,193,361,2020-04-20 - 2024-02-19
-Pulumi,Git,118,114327,4241,8012,2017-09-04 - 2024-10-18
-AWS CDK,Git,210,140200,2622,2780,2018-10-23 - 2024-10-12
