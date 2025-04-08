@@ -15,6 +15,7 @@ import git
 import concurrent.futures
 import nltk
 nltk.download('punkt')
+nltk.download('punkt_tab')
 
 '''
 This script goes to each repo and mines commits and commit messages and then get the defect category 
