@@ -166,7 +166,7 @@ def analyzeCommit(repo_path_param, iac_commits_mapping):
             if len(bug_categ) == 0:
               per_commit_defect_categ_list.append(constants.BUGGY_COMMIT)
             else:
-              per_commit_defect_categ_list.append(bug_categ)
+              per_commit_defect_categ_list += bug_categ
       else:
         per_commit_defect_categ_list  = [constants.NO_DEFECT_CATEG]
 
