@@ -48,7 +48,7 @@ ROOT_TOKEN = 'ROOT'
 STR_LIST_BOUNDS  = 3 # tri-grams 
 NO_DEFECT_CATEG        = 'NO_DEFECT'
 BUGGY_COMMIT           = 'BUGGY_COMMIT'
-prem_bug_kw_list      = ['error', 'bug', 'fix', 'issue', 'mistake', 'incorrect', 'fault', 'defect', 'flaw', 'solve' ]
+prem_bug_kw_list      = ['error', 'bug', 'fix', 'issu', 'mistake', 'incorrect', 'fault', 'defect', 'flaw', 'solve' ]
 
 CONFIG_DEFECT_CATEG    = 'CONFIG_DATA_DEFECT'
 config_defect_kw_list       = ['value', 'config', 'option',  'setting', 'hiera', 'data']
@@ -101,7 +101,7 @@ network_extra_kw_list       = ['gateway']
 # ip tem que sair por causa de descrIPt em doc
 
 STORAGE_DEFECT_CATEG        = 'CD_STORAGE_DEFECT'
-storage_defect_kw_list      = ['sql', 'db', 'disk']
+storage_defect_kw_list      = ['sql', 'db', 'databas', 'disk']
 storage_extra_kw_list       = ['disk']
 # retirar database por causa de data em configuration
 
