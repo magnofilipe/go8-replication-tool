@@ -62,12 +62,12 @@ diff_depen_code_elems = ['~>' , '::', 'include', 'packag', 'exec', 'require', 'i
 DOC_DEFECT_CATEG      = 'DOC_DEFECT'
 # origal author doc_defect_kw_list    =     ['doc', 'comment', 'spec', 'license', 'copyright', 'notice', 'header', 'readme'] 
 # changed made removing 'spec' and header
-doc_defect_kw_list    =     ['doc', 'comment', 'license', 'copyright', 'notice', 'readm'] 
+doc_defect_kw_list    =     ['doc', 'comment', 'licens', 'copyright', 'notic', 'readm'] 
 doc_defect_kw_list    +=    ['descript']
 
 IDEM_DEFECT_CATEG     = 'IDEM_DEFECT'
 idem_defect_kw_list   =     ['idempot']
-idem_defect_kw_list   +=    ['non-determinism', 'determinis', 'determin']
+idem_defect_kw_list   +=    ['determin']
 
 diff_idem_code_elem    = 'class' 
 diff_idem_removal_cnt  = 10 
@@ -79,7 +79,7 @@ diff_logic_code_elems = ['if' , 'unless', 'els', 'case']
 diff_logic_code_elems+= ['while', 'elif']
 
 SECU_DEFECT_CATEG           = 'SECURITY_DEFECT'
-secu_defect_kw_list         =     ['vulnerab', 'ssl', 'secr', 'authenti', 'password', 'security', 'cve']
+secu_defect_kw_list         =     ['vulner', 'ssl', 'secr', 'authent', 'password', 'security', 'cve']
 # secu_defect_kw_list         +=    ['cert', 'firewall', 'encrypt', 'protect']
 # adding access to control
 secu_defect_kw_list         +=    ['cert', 'firewall', 'encrypt', 'protect', 'access']
@@ -117,7 +117,7 @@ syntax_defect_kw_list   += ['type', 'format', 'naming', 'casing', 'styl', 'comma
 # retirar name por causa de username
 
 SERVICE_RESOURCE_DEFECT_CATEG        = 'SERVICE_RESOURCE_DEFECT'
-resource_defect_kw_list     = ['service', 'server', 'location', 'resourc', 'provi', 'cluster']
+resource_defect_kw_list     = ['servic', 'server', 'location', 'resourc', 'provi', 'cluster']
 resource_xtra_kw_list       = ['kube','cloud']
 diff_service_code_elems     = ['service'] 
 
