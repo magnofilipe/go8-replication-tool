@@ -16,8 +16,6 @@ IAC_FILES = [
     ".py", ".go", ".js", ".ts", ".java", ".tf",
     ".cs", ".fs", ".vb", ".cpp", ".kt", ".php", ".rb", ".swift", ".abap", ".edn"
 ]
-# IAC_FILES = ['.pp']
-# IAC_FILES = ['Pulumi.yaml', 'Pulumi.yml', 'cdk.json', 'cdktf.json']
 DATE_TIME_FORMAT = "%Y-%m-%dT%H-%M-%S"
 WHITE_SPACE  = ' '
 TAB = '\t'
@@ -29,10 +27,7 @@ CSV_DEFAULT_PATH = '/home/aluno/filtered-repositories-iac-criteria/criteria4/'
 
 CHANGE_DIR_CMD = 'cd '
 GIT_COMM_CMD_1 = "git show --name-status "
-# Here it's important
-#GIT_COMM_CMD_2 = "  | awk '/.pp/ {print $2}'" 
 GIT_COMM_CMD_2 = " | awk '/(Pulumi\\.yaml|Pulumi\\.yml|cdk\\.json|cdktf\\.json|\\.py|\\.go|\\.js|\\.ts|\\.java|\\.tf|\\.cs|\\.fs|\\.vb|\\.cpp|\\.kt|\\.php|\\.rb|\\.swift|\\.abap|\\.edn)/ {print $2}'"
-# GIT_COMM_CMD_2 = " | awk '/(Pulumi\\.yaml|Pulumi\\.yml|cdk\\.json|cdktf\\.json|\\.py|\\.go|\\.js|\\.ts|\\.java|\\.tf)/ {print $2}'"
 BASH_CMD = 'bash'
 BASH_FLAG = '-c'
 GIT_SHOW_CMD = "git show"
@@ -54,8 +49,8 @@ CONFIG_DEFECT_CATEG    = 'CONFIG_DATA_DEFECT'
 config_defect_kw_list       = ['value', 'config', 'option',  'setting', 'hiera', 'data']
 
 DEP_DEFECT_CATEG       = 'DEP_DEFECT'
-dep_defect_kw_list    =     ['requir', 'depend', 'relation', 'order', 'sync', 'compatibil', 'ensure',  'inherit']
-dep_defect_kw_list    +=    ['version', 'deprecat', 'packag', 'path', 'module', 'upgrad', 'updat']
+dep_defect_kw_list    =     ['requir', 'depend', 'relation', 'order', 'sync', 'compatibil', 'ensur',  'inherit']
+dep_defect_kw_list    +=    ['version', 'deprecat', 'packag', 'path', 'modul', 'upgrad', 'updat']
 dep_xtra_kw_list       = ['module']
 
 # Retirado import por causa de port em network
@@ -67,7 +62,7 @@ diff_depen_code_elems = ['~>' , '::', 'include', 'packag', 'exec', 'require', 'i
 DOC_DEFECT_CATEG      = 'DOC_DEFECT'
 # origal author doc_defect_kw_list    =     ['doc', 'comment', 'spec', 'license', 'copyright', 'notice', 'header', 'readme'] 
 # changed made removing 'spec' and header
-doc_defect_kw_list    =     ['doc', 'comment', 'license', 'copyright', 'notice', 'readme'] 
+doc_defect_kw_list    =     ['doc', 'comment', 'license', 'copyright', 'notice', 'readm'] 
 doc_defect_kw_list    +=    ['descript']
 
 IDEM_DEFECT_CATEG     = 'IDEM_DEFECT'
@@ -109,7 +104,7 @@ CACHE_DEFECT_CATEG          = 'CD_CACHE_DEFECT'
 cache_defect_kw_list        = ['cach', 'memory', 'buffer', 'evict', 'ttl']
 
 CREDENTIALS_DEFECT_CATEG    = 'CD_CREDENTIAL_DEFECT'
-credentials_defect_kw_list  = ['polic', 'credentials', 'iam', 'role', 'token', 'user', 'username', 'password']
+credentials_defect_kw_list  = ['polic', 'credential', 'iam', 'role', 'token', 'user', 'usernam', 'password']
 credentials_extra_kw_list   = ['polic']
 diff_credentials_kw_list    = ['polic', 'credential']
 
@@ -118,11 +113,11 @@ file_system_defect_kw_list  = ['file', 'permiss']
 
 SYNTAX_DEFECT_CATEG    = 'SYNTAX_DEFECT'
 syntax_defect_kw_list    = ['compil', 'lint', 'warn', 'typo', 'spell', 'indent', 'regex', 'duplicat', 'variabl', 'whitespac']
-syntax_defect_kw_list   += ['type', 'format', 'naming', 'casing', 'style', 'comma', 'pattern', 'quot']
+syntax_defect_kw_list   += ['type', 'format', 'naming', 'casing', 'styl', 'comma', 'pattern', 'quot']
 # retirar name por causa de username
 
 SERVICE_RESOURCE_DEFECT_CATEG        = 'SERVICE_RESOURCE_DEFECT'
-resource_defect_kw_list     = ['service', 'server', 'location', 'resource', 'provi', 'cluster']
+resource_defect_kw_list     = ['service', 'server', 'location', 'resourc', 'provi', 'cluster']
 resource_xtra_kw_list       = ['kube','cloud']
 diff_service_code_elems     = ['service'] 
 
