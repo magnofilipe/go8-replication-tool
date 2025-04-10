@@ -7,3 +7,4 @@ csv/*
 run_acid.log
 execution_log.txt
 criterias.log
+venv/
