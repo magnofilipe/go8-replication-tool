@@ -2,11 +2,57 @@
 
 # Instalação do Requirements
 
-No arquivo `requirements.txt` estão todos os packages necessários para o funcionamento da ferramenta, para instale-os utilizando o seguinte comando:
+## Importante!
+A biblioteca `spacy` precisa ser utilizada na **versão `3.8.3`**, que atualmente **só é compatível com Python 3.10 ou 3.11**.
 
-```bash
-$ pip install -r requirements.txt
-```
+### Linux ou macOS
+
+#### Se estiver usando **virtual environment (venv)**
+
+1. Verifique a versão do Python no ambiente:
+   ```bash
+   $ ./<nome-do-seu-venv>/bin/python --version
+   ```
+
+2. Se não for 3.10 ou 3.11, instale com `pyenv`:
+
+   ```bash
+    # Instale o pyenv
+   $ curl https://pyenv.run | bash
+
+    # Adicione ao shell (~/.bashrc, ~/.zshrc etc.)
+   export PATH="$HOME/.pyenv/bin:$PATH"
+   eval "$(pyenv init --path)"
+   eval "$(pyenv init -)"
+   ```
+
+3. Instale o Python compatível e recrie o venv:
+   ```bash
+   $ pyenv install 3.11.7
+   $ pyenv local 3.11.7
+
+   $ python -m venv <nome-do-seu-venv>
+   $ source <nome-do-seu-venv>/bin/activate
+   $ pip install -r requirements.txt
+   ```
+
+#### Se **não estiver usando venv**
+
+1. Verifique a versão:
+   ```bash
+   $ python --version
+   ```
+
+2. Caso seja uma versão superior, use o `pyenv` para instalar o Python compatível:
+   ```bash
+   $ pyenv install 3.11.7
+   $ pyenv global 3.11.7
+   ```
+
+3. Instale as dependências:
+   ```bash
+   $ pip install -r requirements.txt
+   ```
 
 **Observação:** Caso tenha algum problema instalando os packages,
 o seguinte comando pode auxiliar: 
