@@ -32,29 +32,29 @@ echo "Creating criterias directories..." | tee -a $log_file
 mkdir -p criterias/criteria1 criterias/criteria2 criterias/criteria3 criterias/criteria4 || handle_error "Failed to create criterias directories"
 
 echo "Running the first filtering process..." | tee -a $log_file
-python3 replication/criterias.py --input $target_dir --output criterias/criteria1 --iac-percentage 2>&1 | tee -a $log_file || handle_error "First filtering process failed"
+python3 replication/criterias.py --dataset $target_dir --input $target_dir --output criterias/criteria1 --iac-percentage --csv csv/criterias-output/criterias_results.csv 2>&1 | tee -a $log_file || handle_error "First filtering process failed"
 
 echo "Running the second filtering process..." | tee -a $log_file
-python3 replication/criterias.py --input criterias/criteria1 --output criterias/criteria2 --fork 2>&1 | tee -a $log_file || handle_error "Second filtering process failed"
+python3 replication/criterias.py --dataset $target_dir --input criterias/criteria1 --output criterias/criteria2 --fork --csv csv/criterias-output/criterias_results.csv 2>&1 | tee -a $log_file || handle_error "Second filtering process failed"
 
 echo "Running the third filtering process..." | tee -a $log_file
-python3 replication/criterias.py --input criterias/criteria2 --output criterias/criteria3 --commits-per-month 2>&1 | tee -a $log_file || handle_error "Third filtering process failed"
+python3 replication/criterias.py --dataset $target_dir --input criterias/criteria2 --output criterias/criteria3 --commits-per-month --csv csv/criterias-output/criterias_results.csv 2>&1 | tee -a $log_file || handle_error "Third filtering process failed"
 
 echo "Running the fourth filtering process..." | tee -a $log_file
-python3 replication/criterias.py --input criterias/criteria3 --output criterias/criteria4 --num-contributors 2>&1 | tee -a $log_file || handle_error "Fourth filtering process failed"
+python3 replication/criterias.py --dataset $target_dir --input criterias/criteria3 --output criterias/criteria4 --num-contributors --csv csv/criterias-output/criterias_results.csv 2>&1 | tee -a $log_file || handle_error "Fourth filtering process failed"
 
 echo "Creating CSV directories..." | tee -a $log_file
 mkdir -p csv/criterias-output || handle_error "Failed to create CSV directories"
 mkdir -p csv/criterias-output/criterias-frequency || handle_error "Failed to create CSV directories"
 
 echo "Generating the CSV with related files..." | tee -a $log_file
-python3 replication/1-related-files-generator.py --input criterias/criteria4 --output csv/criterias-output/csv1_files_with_neighbors.csv 2>&1 | tee -a $log_file || handle_error "CSV related files generation failed"
+python3 replication/1-related-files-generator.py --input $target_dir --output csv/criterias-output/csv1_files_with_neighbors.csv 2>&1 | tee -a $log_file || handle_error "CSV related files generation failed"
 
 echo "Generating the CSV with the commits summary..." | tee -a $log_file
-python3 replication/2-commits-count.py --input csv/criterias-output/csv1_files_with_neighbors.csv --output csv/criterias-output/csv2_iac_commits_summary.csv --dataset-dir criterias/criteria4 2>&1 | tee -a $log_file || handle_error "Commits summary CSV generation failed"
+python3 replication/2-commits-count.py --input csv/criterias-output/csv1_files_with_neighbors.csv --output csv/criterias-output/csv2_iac_commits_summary.csv --dataset-dir $target_dir 2>&1 | tee -a $log_file || handle_error "Commits summary CSV generation failed"
 
 echo "Generating the CSV with the time period..." | tee -a $log_file
-python3 replication/3-time-period.py --input csv/criterias-output/csv2_iac_commits_summary.csv --output csv/criterias-output/csv3_iac_criterias_output.csv --dataset-dir criterias/criteria4 2>&1 | tee -a $log_file || handle_error "Time period CSV generation failed"
+python3 replication/3-time-period.py --input csv/criterias-output/csv2_iac_commits_summary.csv --output csv/criterias-output/csv3_iac_criterias_output.csv --dataset-dir $target_dir 2>&1 | tee -a $log_file || handle_error "Time period CSV generation failed"
 
 echo "Generating the CSV with frequency..." | tee -a $log_file
 python3 replication/4-analyze.py --input csv/criterias-output/csv3_iac_criterias_output.csv --output csv/criterias-output/csv4_iac_output_frequency.csv 2>&1 | tee -a $log_file || handle_error "Frequency CSV generation failed"
