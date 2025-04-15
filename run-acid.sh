@@ -1,7 +1,7 @@
 #!/bin/bash
 
 log_file="run_acid.log"
-source_dir="criterias/criteria4"
+source_dir="dataset"
 flag_arg="REPLICATION"
 target_dir="ACID/dataset/$flag_arg"
 output_dir="csv/acid-output"
@@ -55,7 +55,7 @@ else
 fi
 
 echo "[INFO] Running $script_to_run..." | tee -a "$log_file"
-python3 "$script_to_run" --flag-arg $flag_arg --csv-replication csv/criterias-output/csv3_iac_criterias_output.csv --csv-default criterias/criteria4 --output "$output_dir" 2>>"$log_file"
+python3 "$script_to_run" --flag-arg $flag_arg --csv-replication csv/criterias-output/csv3_iac_criterias_output.csv --csv-default "$source_dir" --output "$output_dir" 2>>"$log_file"
 if [[ $? -eq 0 ]]; then
   echo "[SUCCESS] $script_to_run executed successfully." | tee -a "$log_file"
 else
