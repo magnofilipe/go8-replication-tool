@@ -28,6 +28,8 @@ function handle_error() {
   exit 1
 }
 
+mkdir -p csv/criterias-output || handle_error "Failed to create CSV directories"
+
 echo "Creating criterias directories..." | tee -a $log_file
 mkdir -p criterias/criteria1 criterias/criteria2 criterias/criteria3 criterias/criteria4 || handle_error "Failed to create criterias directories"
 
@@ -44,7 +46,6 @@ echo "Running the fourth filtering process..." | tee -a $log_file
 python3 replication/criterias.py --dataset $target_dir --input criterias/criteria3 --output criterias/criteria4 --num-contributors --csv csv/criterias-output/criterias_results.csv 2>&1 | tee -a $log_file || handle_error "Fourth filtering process failed"
 
 echo "Creating CSV directories..." | tee -a $log_file
-mkdir -p csv/criterias-output || handle_error "Failed to create CSV directories"
 mkdir -p csv/criterias-output/criterias-frequency || handle_error "Failed to create CSV directories"
 
 echo "Generating the CSV with related files..." | tee -a $log_file
