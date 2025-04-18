@@ -10,6 +10,8 @@ import constants
 
 from fuzzywuzzy import fuzz
 
+import re
+
 # [(1, None, '# == Class cdh4::pig'), (None, 1, '# == Class cdh::pig'), (2, 2, '#'), (3, None, '# Installs and configures Apache Pig.'), (None, 3, '# Installs and configures Apache Pig and Pig DataFu.'), (4, 4, '#'), (5, None, 'class cdh4::pig {'), (6, None, "  package { 'pig':"), (7, None, "    ensure => 'installed',"), (8, None, '  }'), (None, 5, 'class cdh::pig('), (None, 6, "    $pig_properties_template = 'cdh/pig/pig.properties.erb',"), (None, 7, "    $log4j_template          = 'cdh/pig/log4j.properties.erb',"), (None, 8, ')'), (None, 9, '{'), (None, 10, '    # cdh::pig requires hadoop client and configs are installed.'), (None, 11, "    Class['cdh::hadoop'] -> Class['cdh::pig']"), (9, 12, ''), (10, None, "  file { '/etc/pig/conf/pig.properties':"), (11, None, "    content => template('cdh4/pig/pig.properties.erb'),"), (12, None, "    require => Package['pig'],"), (13, None, '  }'), (None, 13, "    package { 'pig':"), (None, 14, "        ensure => 'installed',"), (None, 15, '    }'), (None, 16, "    package { 'pig-udf-datafu':"), (None, 17, "        ensure => 'installed',"), (None, 18, '    }'), (None, 19, ''), (None, 20, '    $config_directory = "/etc/pig/conf.${cdh::hadoop::cluster_name}"'), (None, 21, '    # Create the $cluster_name based $config_directory.'), (None, 22, '    file { $config_directory:'), (None, 23, "        ensure  => 'directory',"), (None, 24, "        require => Package['pig'],"), (None, 25, '    }'), (None, 26, "    cdh::alternative { 'pig-conf':"), (None, 27, "        link    => '/etc/pig/conf',"), (None, 28, '        path    => $config_directory,'), (None, 29, '    }'), (None, 30, ''), (None, 31, '    file { "${config_directory}/pig.properties":'), (None, 32, '        content => template($pig_properties_template),'), (None, 33, "        require => Package['pig'],"), (None, 34, '    }'), (None, 35, '    file { "${config_directory}/log4j.properties":'), (None, 36, '        content => template($log4j_template),'), (None, 37, "        require => Package['pig'],"), (None, 38, '    }'), (14, 39, '}')]
 
 def parseTheDiff(diff_text):
@@ -145,6 +147,27 @@ def checkDiffForDepDefects(diff_text):
 
     return final_flag
 
+import re
+
+def has_comment(line):
+    # ignore if it's a string
+    if re.fullmatch(r'\s*["\'].*["\']\s*', line.strip()):
+        return False
+
+    # line's entire comment
+    if re.search(r'^\s*(#|//).+', line):
+        return True
+    
+    # inline comment
+    if re.search(r'[^"\']*(#|//).+', line):
+        return True
+
+    # blocks comment
+    if re.search(r'/\*.*?\*/', line, re.DOTALL):
+        return True
+
+    return False
+
 def checkDiffForDocDefects(diff_text):
     lines_changed = []
     final_flag = False 
@@ -156,11 +179,10 @@ def checkDiffForDocDefects(diff_text):
             for change_tuple in all_changes_line_by_line:
                 content = change_tuple[2] 
                 content = content.replace(constants.WHITE_SPACE, '')
-                if (change_tuple[0] != None ) and (content.startswith(symbol) for symbol in constants.comments_elems):
-                    line_numbers_added.append( content )
-                
-                if (change_tuple[1] != None ) and (content.startswith(symbol) for symbol in constants.comments_elems):
-                    line_numbers_deleted.append( content )                 
+                if change_tuple[0] is not None and has_comment(content):
+                    line_numbers_added.append(content)
+                if change_tuple[1] is not None and has_comment(content):
+                    line_numbers_deleted.append(content)                
         lines_changed = list(set(line_numbers_added).intersection(line_numbers_deleted)) 
         # print lines_changed
     lines_changed = [x_ for x_ in lines_changed if len(x_) > 1 ]
