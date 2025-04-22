@@ -5,22 +5,28 @@ source_dir="dataset"
 flag_arg="REPLICATION"
 target_dir="ACID/dataset/$flag_arg"
 output_dir="csv/acid-output"
-script_to_run="ACID/main.py"  # Padrão
+script_to_run="ACID/main.py"  
+python_cmd="python3"          
 
 function usage() {
-  echo "Usage: $0 [-c]"
+  echo "Usage: $0 [-c] [-p <python_interpreter>]"
   echo "Options:"
   echo "  -c    Use 'main-concurrent.py' instead of 'main.py'"
+  echo "  -p    Specify the Python interpreter (default is 'python3')"
   exit 1
 }
 
 echo "Starting run-acid.sh" | tee -a "$log_file"
 
-while getopts "c" opt; do
+while getopts "cp:" opt; do
   case "$opt" in
     c) 
       script_to_run="ACID/main-concurrent.py"
       echo "[INFO] Using concurrent script: $script_to_run" | tee -a "$log_file"
+      ;;
+    p) 
+      python_cmd="$OPTARG"
+      echo "[INFO] Using Python interpreter: $python_cmd" | tee -a "$log_file"
       ;;
     *) 
       usage 
@@ -54,8 +60,8 @@ else
   exit 1
 fi
 
-echo "[INFO] Running $script_to_run..." | tee -a "$log_file"
-python3 "$script_to_run" --flag-arg $flag_arg --csv-replication csv/criterias-output/csv3_iac_criterias_output.csv --csv-default "$source_dir" --output "$output_dir" 2>>"$log_file"
+echo "[INFO] Running $script_to_run with $python_cmd..." | tee -a "$log_file"
+$python_cmd "$script_to_run" --flag-arg $flag_arg --csv-replication csv/criterias-output/csv3_iac_criterias_output.csv --csv-default "$source_dir" --output "$output_dir" 2>>"$log_file"
 if [[ $? -eq 0 ]]; then
   echo "[SUCCESS] $script_to_run executed successfully." | tee -a "$log_file"
 else
