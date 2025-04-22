@@ -1,1 +1,1 @@
-# Insira o Link do Repositório. Exemplo: https://github.com/XXXX/XXXX
+# Insert the repository links. Example: https://github.com/XXXX/XXXX
