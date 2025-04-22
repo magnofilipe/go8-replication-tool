@@ -1,155 +1,180 @@
-# go8-replication-tool
+# Replication Package for "A Defect Taxonomy for Infrastructure as Code Scripts: A Replication Study"
 
-# Instalação do Requirements
+## Purpose
 
-## Importante!
-A biblioteca `spacy` precisa ser utilizada na **versão `3.8.3`**, que atualmente **só é compatível com Python 3.10 ou 3.11**.
+This article presents the replication package associated with our paper:
 
-### Linux ou macOS
+TO-DO
 
-#### Se estiver usando **virtual environment (venv)**
+<!-- > Junayed Mahmud, Nadeeshan De Silva, Safwat Ali Khan, Seyed Hooman Mostafavi, SM Hasan Mansur, Oscar Chaparro, Andrian Marcus, and Kevin Moran, “_**On Using GUI Interaction Data to Improve Text Retrieval-based Bug Localization**_,” in Proceedings of the 46th IEEE/ACM International Conference on Software Engineering (ICSE 2024) -->
 
-1. Verifique a versão do Python no ambiente:
+<!-- Nosso trabalho replica o trabalho: [...] -->
+Link to the full paper: TO-DO
+
+## Provenance
+
+TO-DO
+
+## Directory Structure (Source Code)
+
+TO-DO
+
+## Replication Tool
+
+### Setup
+
+#### Important
+- The `spacy` library needs to be used in **version 3.8.3**, which currently (April 2025) is only **compatible with Python 3.10 or 3.11**.
+- Utilize either the Linux or macOS operating systems to execute the tool.
+
+#### If you are using virtual environment (venv)
+
+1. Check the Python version in the environment:
    ```bash
-   $ ./<nome-do-seu-venv>/bin/python --version
+   $ ./<your-venv-name>/bin/python --version
    ```
 
-2. Se não for 3.10 ou 3.11, instale com `pyenv`:
-
+2. If it is not Python 3.10 or 3.11, install using `pyenv`:
    ```bash
-   # Instale o pyenv
+   # Install pyenv
    curl https://pyenv.run | bash
 
-   # Adicione ao shell (~/.bashrc, ~/.zshrc etc.)
+   # Add to your shell (~/.bashrc, ~/.zshrc, ...)
    export PATH="$HOME/.pyenv/bin:$PATH"
    eval "$(pyenv init --path)"
    eval "$(pyenv init -)"
    ```
-
-3. Instale o Python compatível e recrie o venv:
+3. Install the compatible Python version and recreate the venv:
    ```bash
    pyenv install 3.11.7
    pyenv local 3.11.7
 
-   python -m venv <nome-do-seu-venv>
-   source <nome-do-seu-venv>/bin/activate
+   python -m venv <your-venv-name>
+   source <your-venv-name>/bin/activate
    pip install -r requirements.txt
    ```
 
-#### Se **não estiver usando venv**
+#### If you are NOT using virtual environment (venv)
 
-1. Verifique a versão:
+1. Check the Python version:
    ```bash
    python --version
    ```
 
-2. Caso seja uma versão superior, use o `pyenv` para instalar o Python compatível:
+2. If it is not Python 3.10 or 3.11, use `pyenv` to install the compatible Python version:
    ```bash
    pyenv install 3.11.7
    pyenv global 3.11.7
    ```
 
-3. Instale as dependências:
-   ```bash
+3. Install the dependencies:
+    ```bash
    pip install -r requirements.txt
    ```
 
-**Observação:** Caso tenha algum problema instalando os packages,
-o seguinte comando pode auxiliar: 
-```bash
-pip install -r requirements.txt --break-system-packages
-```
+- **Note:** If you encounter any issues installing the packages, the following command may be helpful:
+    ```bash
+    pip install -r requirements.txt --break-system-packages
+    ```
 
-Após instalar todos packages, ainda é necessário rodar o seguinte comando:
+4. After installing all the packages, run the following command:
+    ```bash
+    python3 -m spacy download en_core_web_sm
+    ```
 
-```bash
-python3 -m spacy download en_core_web_sm
-```
+#### Script Execution Guide
 
-# Exemplo de execução:
+1. Populate the `repos_list.txt` file with the links of all repositories intended for cloning.
 
-- OBS1: Todos os scripts geram Logs, caso algum deles falhe, é possível verificar o motivo!
+2. Subsequently, the cloning script can be executed:
 
-1. Adicionaremos um repositório na lista p/ clonagem:
-```bash
-echo "https://github.com/mitodl/ol-infrastructure" >> repos_list.txt
-```
+    ```bash
+    ./clone-repos.sh
+    ```
 
-2. Clone o repositório:
-```bash
-./clone-repos.sh
-```
-- OBS2: Esse repositório é público por isso não precisa autenticação, em repositórios privados é necessário
-passar o tipo de autenticação que deseja fazer:
-```bash
-# Autenticação por meio de SSH
-./clone-repos.sh -c ssh
-# Autenticação por meio de Token
-./clone-repos.sh -c token
-```
+    ```bash
+    "Usage: ./clone-repos.sh [-d directory] [-f repos_file] [-s start_line] [-t threads] [-c credential]
 
-3. Aplique os critérios de seleção de repositório (O repositório do exemplo se encaixa dentro dos critérios):
-```bash
-./apply-criterias.sh
-```
+    Options:
+        -d  Destination directory for cloning the repositories (default: dataset)
+        -f  File containing the list of repositories (one per line) (default: repos_list.txt)
+        -s  Starting line to resume the cloning process (default: 2)
+        -t  Number of concurrent clones (default: 10)
+        -c  Credential type: ssh or token"
+    ```
 
-4. Após isso, execute a ferramenta por meio do seguinte comando:
-```bash
-# O comando a seguir roda a versão serial da ferramenta
-./run-acid 
-# E adicionando a flag -c, roda a versão concorrente (RECOMENDADO)
-./run-acid -c
-```
+    Upon completion of the execution, the repositories will be cloned to the specified destination. Additionally, a CSV file will be generated within the `csv` directory, indicating the success or failure status of each repository's cloning process.
 
-5. Por fim, dentro do diretório 'csv' estará todos resultados. Eles incluem o resultado da execução
-e categorização de defeitos dos repositórios (no diretório csv/acid-ouput) e um resumo de quais são
-as características dos repositórios (ex: quantidade de linguagens Pulumi, AWS CDK, Terraform ou EDN).
+- **Note:**  Depending on the chosen number of threads, the machine may encounter a Too Many Files Open error. To resolve this, the limit for the number of concurrently open files can be redefined using the following command:
 
-# Os comentário a seguir estão apenas detalhando o que cada comando bash faz:
-# I. Clonagem Dos Repositórios
-1. Preencha o arquivo `repos_list.txt` com o link de todos os repositórios para fazer o clone!
+    ```bash
+    # The default is 1024; a higher number such as 4096 can be selected.
+    ulimit -n 4096
+    ```
 
-2. Após isso poderá rodar o script de clonagem:
-```bash
-./clone-repos.sh
+3. Apply selection criteria and generate the necessary CSV files for analysis with the following command:
 
-"Uso: ./clone-repos.sh [-d directory] [-f repos_file] [-s start_line] [-t threads] [-c credential]
-  Opções:
-    -d  Diretório de destino para clonar os repositórios (padrão: dataset)
-    -f  Arquivo contendo a lista de repositórios (um por linha) (padrão: repos_list.txt)
-    -s  Linha inicial para continuar o processo de clonagem (padrão: 2)
-    -t  Número de clones simultâneos (padrão: 10)
-    -c  Tipo de credencial: ssh ou token"
-```
+    ```bash
+    ./apply-criterias.sh
+    ```
 
-**Observação:** Dependendo da escolha do número de threads, a máquina pode apresentar o erro **Too Many Files Open**, para resolver isso você pode redefinir o limite de arquivos que podem ser aberto ao mesmo tempo com o seguinte comando: 
-``` bash
-# O padrão é 1024, você pode escolher um número mais alto que 4096
-ulimit -n 4096
-```
+    ```bash
+    "Usage: ./apply-criterias.sh [-d directory]
+    Options:
+        -d  Destination directory where the repositories were cloned (default: dataset)"
+    ```
 
-Após finalizar a execução, os repositórios estarão clonados no destino indicado,
-além de gerar um csv indicando quais repositórios tiveram sucesso ou falha dentro
-do diretório `csv`.
+4. Execute the defect categorization tool, which is available in two versions: concurrent and serial.
 
-# II. Aplicar Os Critérios De Seleção
+    ```bash
+    ./run-acid.sh
+    ```
 
-Rode o seguinte comando para aplicar os critérios de seleção dos repositórios
-e gerar os csvs necessários para análise.
-```bash 
-./apply-criterias.sh
-"Uso: ./apply-criterias.sh [-d directory] 
-  Opções:
-    -d  Diretório de destino para clonar os repositórios (padrão: dataset)"
-```
+    ```bash
+    "Usage: ./run-acid [-c]
+    Options:
+        -c  This option will utilize 'main-concurrent.py' instead of 'main.py'."
+    ```
 
-# III. Rodar A Ferramenta De Categorização De Defeitos 
+#### Toy Example
 
-Rode a ferramenta de categorização de defeitos, ela tem duas versões
-uma concorrente e outra serial.
-```bash
-./run-acid.sh
-"Uso: ./run-acid [-c]
-  Opções:
-    -c  Utilize 'main-concurrent.py' ao invés de 'main.py'"
-```
+**Note**: All scripts generate logs, and in the event of a failure, the reason can be investigated.
+
+1. Add a repository to clone list:
+    ```bash
+    echo "https://github.com/mitodl/ol-infrastructure" >> repos_list.txt
+    ```
+
+2. Clone repository:
+    ```bash
+    ./clone-repos.sh
+    ```
+
+- **Note**: As this repository is public, authentication is not required. For private repositories, it is necessary to provide the type of authentication desired:
+    ```bash
+    # SSH
+    ./clone-repos.sh -c ssh
+    # Token
+    ./clone-repos.sh -c token
+    ```
+
+3. Apply repository selection criterias:
+    ```bash
+    ./apply-criterias.sh
+    ```
+
+4. Execute the tool:
+    ```bash
+    # Serial version
+    ./run-acid 
+    # Concurrent version (RECOMMENDED)
+    ./run-acid -c
+    ```
+
+5. Finally, all the results will be located within the `csv` directory. These include the execution results, defect categorization of the repositories and a summary of the repositories characteristics (e.g., the number of Pulumi, AWS CDK, Terraform, or EDN languages).
+
+## References
+
+TO-DO
+- PIPR
+- Go8
