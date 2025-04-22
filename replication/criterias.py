@@ -27,7 +27,7 @@ def iac_percentage(repo_path):
         total_files += len(files)
     for iac_dir in iac_directories:
         iac_files += sum(len(files) for _, _, files in os.walk(iac_dir))
-    percentage = (iac_files / total_files) * 100 if total_files > 0 else None
+    percentage = (iac_files / total_files) * 100 if total_files > 0 else 0
     print(f"[INFO] {repo_path}: IaC = {iac_files}/{total_files} arquivos ({percentage:.2f}%)")
     return percentage
 
@@ -40,7 +40,7 @@ def commits_per_month(repo_path):
     )
     dates = result.stdout.splitlines()
     unique_months = set(dates)
-    cpm = len(dates) / len(unique_months) if unique_months else None
+    cpm = len(dates) / len(unique_months) if unique_months else 0
     print(f"[INFO] {repo_path}: {len(dates)} commits em {len(unique_months)} meses = {cpm:.2f} commits/mês")
     return cpm
 
@@ -149,8 +149,9 @@ if __name__=="__main__":
         
         # Carrega CSV existente
         existing_df = pd.read_csv(csv_path)
-
         # Junta com base na coluna "repo", mantendo dados anteriores e atualizando os novos
+        existing_df["repo"] = existing_df["repo"].astype(str)
+        new_df["repo"] = new_df["repo"].astype(str)
         merged_df = pd.merge(existing_df, new_df, on="repo", how="outer", suffixes=('', '_new'))
 
         # Atualiza os campos com os dados novos (colunas *_new), se existirem
