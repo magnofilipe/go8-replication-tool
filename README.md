@@ -8,38 +8,38 @@ TO-DO
 
 <!-- > Junayed Mahmud, Nadeeshan De Silva, Safwat Ali Khan, Seyed Hooman Mostafavi, SM Hasan Mansur, Oscar Chaparro, Andrian Marcus, and Kevin Moran, “_**On Using GUI Interaction Data to Improve Text Retrieval-based Bug Localization**_,” in Proceedings of the 46th IEEE/ACM International Conference on Software Engineering (ICSE 2024) -->
 
-<!-- Nosso trabalho replica o trabalho: [...] -->
+<!-- Nosso trabalho replica o trabalho [2]: [...] -->
 Link to the full paper: TO-DO
 
 ## Dataset & Reproducibility
 
 This repository contains the full source code and detailed instructions needed to reproduce the results presented in our paper.
 
-The dataset used in our experiments is available here, and a permanent archive of code is hosted on Zenodo: <zenodo-link>.
+The dataset used in our experiments [1] is available here: <dataset-link>, and a permanent archive of code is hosted on Zenodo: <zenodo-link>.
 
 ## Directory Structure (Source Code)
 
 ```bash
 ├── ACID
-│   ├── classifier.py --> text
-│   ├── constants.py --> text
-│   ├── diff_parser.py --> text
-│   ├── excavator.py --> text
-│   ├── main-concurrent.py --> text
-│   └── main.py --> text
-├── apply-criterias.sh --> text
-├── clone-repos.sh --> text
-├── README.md --> text
+│   ├── classifier.py ---> classifies commit messages into defect categories using NLP and rule-based analysis.
+│   ├── constants.py ---> stores configuration strings, keywords, and constants for defect categorization.
+│   ├── diff_parser.py ---> analyzes Git diff content to detect code changes related to specific defect types.
+│   ├── excavator.py ---> extracts and processes IaC-related commits from Git repositories for defect analysis.
+│   ├── main-concurrent.py ---> concurrent version of the main script.
+│   └── main.py ---> main script to mine and categorize defects in IaC commits.
 ├── replication
-│   ├── 1-related-files-generator.py --> text
-│   ├── 2-commits-count.py --> text
-│   ├── 3-time-period.py --> text
-│   ├── 4-analyze.py --> text
-│   ├── criteria-frequency.py --> text
-│   └── criterias.py --> text
-├── repos_list.txt --> text
-├── requirements.txt --> text
-└── run-acid.sh --> text
+│   ├── 1-related-files-generator.py ---> identifies IaC files and related neighboring files within repositories.
+│   ├── 2-commits-count.py --->  counts the number of commits associated with identified IaC and related files.
+│   ├── 3-time-period.py ---> determines the time period of commits related to IaC files in repositories.
+│   ├── 4-analyze.py ---> aggregates and analyzes data from processed repositories to generate summary statistics.
+│   ├── criteria-frequency.py ---> classifies repositories based on detected IaC technology within specified directories.
+│   └── criterias.py ---> applies predefined criteria to filter and select relevant IaC repositories.
+├── README.md
+├── apply-criterias.sh ---> shell script to execute the repository filtering process based on defined criteria.
+├── clone-repos.sh ---> shell script to clone a list of Git repositories in parallel.
+├── repos_list.txt ---> contains a list of repository URLs to be cloned.
+├── requirements.txt ---> dependencies required to run the project.
+└── run-acid.sh ---> shell script to execute the main defect analysis pipeline (ACID).
 ```
 
 ## Replication Tool
@@ -198,6 +198,6 @@ echo "https://github.com/mitodl/ol-infrastructure" >> repos_list.txt
 
 ## References
 
-TO-DO
-- PIPR
-- Go8
+[1] Sokolowski, Daniel, David Spielmann, and Guido Salvaneschi. ”The PIPr dataset of public infrastructure as code programs.” Proceedings of the 21st International Conference on Mining Software Repositories. 2024.
+
+[2] Rahman, Akond, et al. ”Gang of eight: A defect taxonomy for infrastructure as code scripts.” Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering. 2020.
