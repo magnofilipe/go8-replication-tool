@@ -1,32 +1,51 @@
 # Replication Package for "A Defect Taxonomy for Infrastructure as Code Scripts: A Replication Study"
 
-## Purpose
-
-This article presents the replication package associated with the paper:
-
-TO-DO
-
-<!-- > Junayed Mahmud, Nadeeshan De Silva, Safwat Ali Khan, Seyed Hooman Mostafavi, SM Hasan Mansur, Oscar Chaparro, Andrian Marcus, and Kevin Moran, “_**On Using GUI Interaction Data to Improve Text Retrieval-based Bug Localization**_,” in Proceedings of the 46th IEEE/ACM International Conference on Software Engineering (ICSE 2024) -->
-
-<!-- Nosso trabalho replica o trabalho [2]: [...] -->
-Link to the full paper: TO-DO
-
 ## Dataset & Reproducibility
 
-This repository contains the full source code and detailed instructions needed to reproduce the results presented in paper.
-
-The PIPr dataset used in our experiments and a permanent archive of code is hosted on Zenodo: TO-DO.
+This repository contains the full source code and detailed instructions needed to reproduce the results presented in the paper "A Defect Taxonomy for Infrastructure as Code Scripts: A Replication Study". The PIPr dataset used in the experiments and a permanent archive of code is hosted on Zenodo: TO-DO.
 
 ## Directory Structure (Source Code)
 
 ```bash
-├── ACID
+├── ACID ---> original study tool being replicated, available at: https://hub.docker.com/r/akondrahman/acid-puppet
 │   ├── classifier.py ---> classifies commit messages into defect categories using NLP and rule-based analysis.
 │   ├── constants.py ---> stores configuration strings, keywords, and constants for defect categorization.
 │   ├── diff_parser.py ---> analyzes Git diff content to detect code changes related to specific defect types.
 │   ├── excavator.py ---> extracts and processes IaC-related commits from Git repositories for defect analysis.
 │   ├── main-concurrent.py ---> concurrent version of the main script.
 │   └── main.py ---> main script to mine and categorize defects in IaC commits.
+│   
+├── criterias ---> this directory is generated after the tool is executed
+│   ├── criteria1 ---> repositories that passed the 1st criterion: not being a fork.
+│   ├── criteria2 ---> repositories that passed the 1st and 2nd criteria: at least 11% of files are IaC and/or PL-IaC scripts.
+│   ├── criteria3 ---> repositories that passed the 1st, 2nd, and 3rd criteria: monthly commit frequency is ≥ 2.
+│   ├── criteria4 ---> repositories that passed all four criteria: number of contributors is ≥ 10.
+│   
+├── csv ---> this directory is generated after the tool is executed
+│   ├── acid-output
+│   │   ├── REPLICATION_CATEG_OUTPUT_FINAL.csv ---> ACID output
+│   │   └── REPLICATION_ONLY_CATEG_OUTPUT_FINAL.PKL
+│   ├── criterias-output
+│   │   ├── criterias-frequency
+│   │   │   ├── criteria1_output.csv ---> repository ID and technology for those that passed the 1st criterion (as described above).
+│   │   │   ├── criteria2_output.csv ---> repository ID and technology for those that passed the 1st and 2nd criteria (as described above).
+│   │   │   ├── criteria3_output.csv ---> repository ID and technology for those that passed the 1st, 2nd, and 3rd criteria (as described above).
+│   │   │   ├── criteria4_output.csv ---> repository ID and technology for those that passed all four criteria (as described above).
+│   │   │   └── dataset_output.csv ---> repository ID and technology for all analyzed repositories, regardless of criteria.
+│   │   ├── criterias_results.csv ---> individual data for each repository and its corresponding criteria.
+│   │   ├── csv1_files_with_neighbors.csv ---> paths of IaC files (e.g., Pulumi.yaml) and their neighboring related files.
+│   │   ├── csv2_iac_commits_summary.csv ---> commit counts for IaC paths and the entire repository.
+│   │   ├── csv3_iac_criterias_output.csv ---> includes data on the oldest and most recent commits and their deltas.
+│   │   └── csv4_iac_output_frequency.csv ---> summary of repository attributes.
+│   └── clone_logs.csv ---> logs related to repository cloning (success or failure)
+│   
+├── dataset --> contains all repositories selected for cloning.
+│   
+├── paper-analysis-data ---> intermediate results used in study.
+│   ├── oracle-results.csv ---> comparison between the categorization performed by the oracle and by ACID.
+│   ├── sanity-validation.csv ---> sanity check for repositories from PIPr and VTEX.
+│   └── sanity-validation-metrics.csv ---> metrics from the sanity check, including precision and recall.
+│   
 ├── replication
 │   ├── 1-related-files-generator.py ---> identifies IaC files and related neighboring files within repositories.
 │   ├── 2-commits-count.py --->  counts the number of commits associated with identified IaC and related files.
@@ -34,6 +53,7 @@ The PIPr dataset used in our experiments and a permanent archive of code is host
 │   ├── 4-analyze.py ---> aggregates and analyzes data from processed repositories to generate summary statistics.
 │   ├── criteria-frequency.py ---> classifies repositories based on detected IaC technology within specified directories.
 │   └── criterias.py ---> applies predefined criteria to filter and select relevant IaC repositories.
+│   
 ├── README.md
 ├── apply-criterias.sh ---> shell script to execute the repository filtering process based on defined criteria.
 ├── clone-repos.sh ---> shell script to clone a list of Git repositories in parallel.
@@ -195,7 +215,3 @@ echo "https://github.com/mitodl/ol-infrastructure" >> repos_list.txt
 ```
 
 **5.** Finally, all the results will be located within the `csv` directory. These include the execution results, defect categorization of the repositories and a summary of the repositories characteristics (e.g., the number of Pulumi, AWS CDK, Terraform, or EDN languages).
-
-## References
-
-[1] Rahman, Akond, et al. ”Gang of eight: A defect taxonomy for infrastructure as code scripts.” Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering. 2020.
