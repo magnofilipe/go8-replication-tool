@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This article presents the replication package associated with our paper:
+This article presents the replication package associated with the paper:
 
 TO-DO
 
@@ -13,7 +13,7 @@ Link to the full paper: TO-DO
 
 ## Dataset & Reproducibility
 
-This repository contains the full source code and detailed instructions needed to reproduce the results presented in our paper.
+This repository contains the full source code and detailed instructions needed to reproduce the results presented in paper.
 
 The PIPr dataset used in our experiments and a permanent archive of code is hosted on Zenodo: TO-DO.
 
