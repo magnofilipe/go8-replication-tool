@@ -15,7 +15,7 @@ Link to the full paper: TO-DO
 
 This repository contains the full source code and detailed instructions needed to reproduce the results presented in our paper.
 
-The dataset used in our experiments [1] is available here: <dataset-link>, and a permanent archive of code is hosted on Zenodo: <zenodo-link>.
+The PIPr dataset used in our experiments and a permanent archive of code is hosted on Zenodo: TO-DO.
 
 ## Directory Structure (Source Code)
 
@@ -198,6 +198,4 @@ echo "https://github.com/mitodl/ol-infrastructure" >> repos_list.txt
 
 ## References
 
-[1] Sokolowski, Daniel, David Spielmann, and Guido Salvaneschi. ”The PIPr dataset of public infrastructure as code programs.” Proceedings of the 21st International Conference on Mining Software Repositories. 2024.
-
-[2] Rahman, Akond, et al. ”Gang of eight: A defect taxonomy for infrastructure as code scripts.” Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering. 2020.
+[1] Rahman, Akond, et al. ”Gang of eight: A defect taxonomy for infrastructure as code scripts.” Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering. 2020.
